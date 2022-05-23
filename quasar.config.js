@@ -8,7 +8,7 @@
 // Configuration for your app
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
 
-const { configure } = require("quasar/wrappers");
+const { configure } = require("quasar/wrappers")
 
 module.exports = configure(function (/* ctx */) {
     return {
@@ -27,7 +27,7 @@ module.exports = configure(function (/* ctx */) {
         // app boot file (/src/boot)
         // --> boot files are part of "main.js"
         // https://v2.quasar.dev/quasar-cli/boot-files
-        boot: [],
+        boot: ["init", "firebase"],
 
         // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#css
         css: ["app.scss"],
@@ -37,7 +37,7 @@ module.exports = configure(function (/* ctx */) {
             // 'ionicons-v4',
             // 'mdi-v5',
             // 'fontawesome-v6',
-            // 'eva-icons',
+            "eva-icons",
             // 'themify',
             // 'line-awesome',
             // 'roboto-font-latin-ext', // this or either 'roboto-font', NEVER both!
@@ -49,13 +49,7 @@ module.exports = configure(function (/* ctx */) {
         // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#build
         build: {
             target: {
-                browser: [
-                    "es2019",
-                    "edge88",
-                    "firefox78",
-                    "chrome87",
-                    "safari13.1",
-                ],
+                browser: ["es2019", "edge88", "firefox78", "chrome87", "safari13.1"],
                 node: "node16",
             },
 
@@ -86,12 +80,23 @@ module.exports = configure(function (/* ctx */) {
         // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#devServer
         devServer: {
             // https: true
-            open: true, // opens browser window automatically
+            open: false, // opens browser window automatically
         },
 
         // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#framework
         framework: {
-            config: {},
+            config: {
+                notify: {
+                    position: "bottom",
+                    progress: true,
+                    timeout: 3000,
+                    actions: [{ icon: "close", color: "white" }],
+                },
+                loading: {
+                    spinner: "QSpinnerDots",
+                    spinnerColor: "primary",
+                },
+            },
 
             // iconSet: 'material-icons', // Quasar icon set
             // lang: 'en-US', // Quasar language pack
@@ -104,7 +109,7 @@ module.exports = configure(function (/* ctx */) {
             // directives: [],
 
             // Quasar plugins
-            plugins: [],
+            plugins: ["Dialog", "LocalStorage", "Notify", "Loading"],
         },
 
         // animations: 'all', // --- includes all animations
@@ -201,5 +206,5 @@ module.exports = configure(function (/* ctx */) {
             // extendBexScriptsConf (esbuildConf) {}
             // extendBexManifestJson (json) {}
         },
-    };
-});
+    }
+})

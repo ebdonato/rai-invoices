@@ -1,1 +1,17 @@
 // app global css in SCSS form
+.bg-light {
+    background: $secondary !important;
+    background: -webkit-linear-gradient(to right, $secondary, $accent) !important;
+    background: linear-gradient(to bottom, $secondary, $accent) !important;
+}
+
+.bg-dark {
+    background: $secondary !important;
+    background: -webkit-linear-gradient(to right, $secondary, darken($blue-grey-10, 13)) !important;
+    background: linear-gradient(to bottom, $secondary, darken($blue-grey-10, 13)) !important;
+}
+
+.big {
+    width: 95%;
+    max-width: 1200px;
+}

@@ -1,106 +1,113 @@
 <template>
     <q-layout view="lHh Lpr lFf">
-        <q-header elevated>
-            <q-toolbar>
-                <q-btn
-                    flat
-                    dense
-                    round
-                    icon="menu"
-                    aria-label="Menu"
-                    @click="toggleLeftDrawer"
-                />
+        <q-header>
+            <q-toolbar class="bg-secondary">
+                <q-btn v-if="isHome" flat dense round icon="favorite" aria-label="Feito por" @click="onMadeBy" class="text-yellow">
+                    <q-tooltip :delay="1000"> Feito por </q-tooltip>
+                </q-btn>
 
-                <q-toolbar-title> Quasar App </q-toolbar-title>
+                <q-btn v-else flat dense round icon="home" aria-label="Início" :to="{ name: 'IndexPage' }">
+                    <q-tooltip :delay="1000"> Início </q-tooltip>
+                </q-btn>
 
-                <div>Quasar v{{ $q.version }}</div>
+                <q-toolbar-title> Recibos do Rainério </q-toolbar-title>
+
+                <div class="q-gutter-sm">
+                    <q-btn flat dense round :icon="themeIcon" aria-label="Tema" @click="toggleTheme">
+                        <q-tooltip :delay="1000">{{ themeLabel }} </q-tooltip>
+                    </q-btn>
+
+                    <q-btn flat dense round icon="store" aria-label="Empresas" :to="{ name: 'CustomersPage' }">
+                        <q-tooltip :delay="1000"> Empresas </q-tooltip>
+                    </q-btn>
+
+                    <q-btn flat dense round icon="receipt" aria-label="Recibos" :to="{ name: 'InvoicesPage' }">
+                        <q-tooltip :delay="1000"> Recibos </q-tooltip>
+                    </q-btn>
+
+                    <q-btn flat dense round icon="logout" aria-label="Sair" @click="logout">
+                        <q-tooltip :delay="1000"> Sair </q-tooltip>
+                    </q-btn>
+                </div>
             </q-toolbar>
         </q-header>
 
-        <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
-            <q-list>
-                <q-item-label header> Essential Links </q-item-label>
-
-                <EssentialLink
-                    v-for="link in essentialLinks"
-                    :key="link.title"
-                    v-bind="link"
-                />
-            </q-list>
-        </q-drawer>
-
         <q-page-container>
-            <router-view />
+            <div
+                :class="{
+                    'bg-light': !isDark,
+                    'bg-dark': isDark,
+                }"
+            >
+                <router-view />
+            </div>
         </q-page-container>
     </q-layout>
 </template>
 
 <script>
-import { defineComponent, ref } from "vue";
-import EssentialLink from "components/EssentialLink.vue";
+import { defineComponent, ref, computed } from "vue"
+import { useQuasar } from "quasar"
+import { useRouter } from "vue-router"
+import { getAuth, signOut } from "firebase/auth"
+import { updateAddressbarColors } from "boot/init"
 
-const linksList = [
-    {
-        title: "Docs",
-        caption: "quasar.dev",
-        icon: "school",
-        link: "https://quasar.dev",
-    },
-    {
-        title: "Github",
-        caption: "github.com/quasarframework",
-        icon: "code",
-        link: "https://github.com/quasarframework",
-    },
-    {
-        title: "Discord Chat Channel",
-        caption: "chat.quasar.dev",
-        icon: "chat",
-        link: "https://chat.quasar.dev",
-    },
-    {
-        title: "Forum",
-        caption: "forum.quasar.dev",
-        icon: "record_voice_over",
-        link: "https://forum.quasar.dev",
-    },
-    {
-        title: "Twitter",
-        caption: "@quasarframework",
-        icon: "rss_feed",
-        link: "https://twitter.quasar.dev",
-    },
-    {
-        title: "Facebook",
-        caption: "@QuasarFramework",
-        icon: "public",
-        link: "https://facebook.quasar.dev",
-    },
-    {
-        title: "Quasar Awesome",
-        caption: "Community Quasar projects",
-        icon: "favorite",
-        link: "https://awesome.quasar.dev",
-    },
-];
+import MadeByDialog from "components/MadeByDialog.vue"
 
 export default defineComponent({
     name: "MainLayout",
 
-    components: {
-        EssentialLink,
-    },
-
     setup() {
-        const leftDrawerOpen = ref(false);
+        const $q = useQuasar()
+
+        const router = useRouter()
+        const isHome = computed(() => router.currentRoute.value.name == "IndexPage")
+
+        const auth = getAuth()
+        const logout = () => {
+            signOut(auth)
+                .then(() => {
+                    router.push({ name: "LoginPage" }).then(() => {
+                        $q.notify({
+                            type: "info",
+                            message: "Tchau!",
+                            caption: "Até brave",
+                        })
+                    })
+                })
+                .catch((error) => {
+                    $q.notify({
+                        type: "negative",
+                        message: "Erro ao sair",
+                        caption: error.message,
+                    })
+                })
+        }
+
+        const isDark = ref($q.dark.isActive)
+        const toggleTheme = () => {
+            isDark.value = !isDark.value
+            $q.dark.set(isDark.value)
+            $q.localStorage.set("isDark", isDark.value)
+            updateAddressbarColors(isDark.value)
+        }
 
         return {
-            essentialLinks: linksList,
-            leftDrawerOpen,
-            toggleLeftDrawer() {
-                leftDrawerOpen.value = !leftDrawerOpen.value;
+            isHome,
+
+            onMadeBy() {
+                $q.dialog({
+                    component: MadeByDialog,
+                })
             },
-        };
+
+            logout,
+
+            isDark,
+            toggleTheme,
+            themeIcon: computed(() => (isDark.value ? "light_mode" : "dark_mode")),
+            themeLabel: computed(() => (isDark.value ? "Usar tema claro" : "Usar tema escuro")),
+        }
     },
-});
+})
 </script>

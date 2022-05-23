@@ -1,9 +1,9 @@
 {
     "editor.bracketPairColorization.enabled": true,
-    "editor.guides.bracketPairs": true,
+    "editor.guides.bracketPairs": "active",
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.codeActionsOnSave": ["source.fixAll.eslint"],
     "eslint.validate": ["javascript", "javascriptreact", "typescript", "vue"],
-    "cSpell.words": ["Rainério"]
+    "cSpell.words": ["Addressbar", "CNPJ", "Contato", "firestore", "icongenie", "Rainério"]
 }

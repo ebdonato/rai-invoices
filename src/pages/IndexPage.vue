@@ -1,17 +1,28 @@
 <template>
     <q-page class="flex flex-center">
-        <img
-            alt="Quasar logo"
-            src="~assets/quasar-logo-vertical.svg"
-            style="width: 200px; height: 200px"
-        />
+        <div class="q-gutter-sm">
+            <q-btn color="primary" class="button" :to="{ name: 'CustomersPage' }">
+                <q-icon left size="3em" name="store" />
+                <div>Clientes</div>
+            </q-btn>
+            <q-btn color="primary" class="button" :to="{ name: 'InvoicesPage' }">
+                <q-icon left size="3em" name="receipt" />
+                <div>Recibos</div>
+            </q-btn>
+        </div>
     </q-page>
 </template>
 
 <script>
-import { defineComponent } from "vue";
+import { defineComponent } from "vue"
 
 export default defineComponent({
     name: "IndexPage",
-});
+})
 </script>
+
+<style lang="scss" scoped>
+.button {
+    width: 170px;
+}
+</style>
