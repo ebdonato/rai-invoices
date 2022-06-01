@@ -19,27 +19,6 @@ const publicRoutesName = ["IndexPage"]
 // "async" is optional;
 // more info on params: https://v2.quasar.dev/quasar-cli/boot-files
 export default boot(({ app, router }) => {
-    app.firebaseApp = initializeApp(firebaseConfig)
-    // getAnalytics(firebaseApp)
-
-    const firebaseAuth = getAuth()
-
-    onAuthStateChanged(firebaseAuth, (user) => {
-        if (user) {
-            // User is signed in, see docs for a list of available properties
-            // https://firebase.google.com/docs/reference/js/firebase.User
-            Notify.create({
-                type: "info",
-                message: `Olá ${user.displayName}`,
-            })
-
-            app.redirectTo &&
-                router.push(app.redirectTo).then(() => {
-                    app.redirectTo = null
-                })
-        }
-    })
-
     router.beforeEach((to, from, next) => {
         const user = firebaseAuth.currentUser
 
@@ -64,5 +43,27 @@ export default boot(({ app, router }) => {
 
         // demais situações, navega normalmente
         next()
+    })
+
+    app.firebaseApp = initializeApp(firebaseConfig)
+    // getAnalytics(firebaseApp)
+
+    const firebaseAuth = getAuth()
+
+    onAuthStateChanged(firebaseAuth, (user) => {
+        if (user) {
+            // User is signed in, see docs for a list of available properties
+            // https://firebase.google.com/docs/reference/js/firebase.User
+            Notify.create({
+                type: "info",
+                message: `Olá ${user.displayName}`,
+            })
+
+            if (!app.redirectTo) app.redirectTo = "/main"
+
+            router.push(app.redirectTo).then(() => {
+                app.redirectTo = null
+            })
+        }
     })
 })

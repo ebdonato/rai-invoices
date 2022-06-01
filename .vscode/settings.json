@@ -5,5 +5,14 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.codeActionsOnSave": ["source.fixAll.eslint"],
     "eslint.validate": ["javascript", "javascriptreact", "typescript", "vue"],
-    "cSpell.words": ["Addressbar", "CNPJ", "Contato", "firestore", "icongenie", "Rainério"]
+    "cSpell.words": [
+        "Addressbar",
+        "CNPJ",
+        "Contato",
+        "firestore",
+        "icongenie",
+        "Iconpacks",
+        "Rainério",
+        "Tchau"
+    ]
 }

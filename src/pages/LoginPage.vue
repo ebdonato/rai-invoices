@@ -23,6 +23,7 @@
             type="a"
             href="https://iconpacks.net/?utm_source=link-attribution&utm_content=8846"
             target="_blank"
+            color="white"
         />
     </q-page>
 </template>
