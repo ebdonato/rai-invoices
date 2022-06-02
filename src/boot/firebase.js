@@ -56,7 +56,7 @@ export default boot(({ app, router }) => {
             // https://firebase.google.com/docs/reference/js/firebase.User
             Notify.create({
                 type: "info",
-                message: `Olá ${user.displayName}`,
+                message: `Olá ${user.displayName ?? user.email}`,
             })
 
             if (!app.redirectTo) app.redirectTo = "/main"

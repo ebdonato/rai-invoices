@@ -36,8 +36,8 @@
                 <q-card-actions align="right">
                     <q-btn v-if="isUpdatingCustomer" color="red" label="Excluir" @click.prevent="onDelete" />
                     <q-space />
-                    <q-btn color="primary" label="OK" type="submit" />
                     <q-btn color="primary" label="Cancel" @click.prevent="onCancelClick" />
+                    <q-btn color="primary" label="OK" type="submit" />
                 </q-card-actions>
             </q-form>
         </q-card>

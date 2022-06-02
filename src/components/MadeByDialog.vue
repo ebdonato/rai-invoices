@@ -23,13 +23,13 @@
             <q-separator inset />
 
             <q-card-actions align="right">
-                <q-btn color="primary" icon="eva-linkedin" aria-label="LinkedIn" type="a" href="https://www.linkedin.com/in/ebdonato/" target="_blank">
+                <q-btn color="primary" icon="fa-brands fa-linkedin" aria-label="LinkedIn" type="a" href="https://www.linkedin.com/in/ebdonato/" target="_blank">
                     <q-tooltip :delay="1000"> linkedin.com/in/ebdonato </q-tooltip>
                 </q-btn>
-                <q-btn color="primary" icon="eva-github" aria-label="Github" type="a" href="https://www.github.com/ebdonato/" target="_blank">
+                <q-btn color="primary" icon="fa-brands fa-github" aria-label="Github" type="a" href="https://www.github.com/ebdonato/" target="_blank">
                     <q-tooltip :delay="1000"> github.com/ebdonato </q-tooltip>
                 </q-btn>
-                <q-btn color="primary" icon="eva-globe" aria-label="Site Pessoal" type="a" href="https://mono.direct/ebdonato" target="_blank">
+                <q-btn color="primary" icon="fa-solid fa-globe" aria-label="Site Pessoal" type="a" href="https://mono.direct/ebdonato" target="_blank">
                     <q-tooltip :delay="1000"> Contatos </q-tooltip>
                 </q-btn>
                 <q-space />

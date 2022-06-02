@@ -36,8 +36,8 @@ module.exports = configure(function (/* ctx */) {
         extras: [
             // 'ionicons-v4',
             // 'mdi-v5',
-            // 'fontawesome-v6',
-            "eva-icons",
+            "fontawesome-v6",
+            // "eva-icons",
             // 'themify',
             // 'line-awesome',
             // 'roboto-font-latin-ext', // this or either 'roboto-font', NEVER both!
