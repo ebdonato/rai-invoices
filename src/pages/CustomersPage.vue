@@ -29,7 +29,7 @@
 
                                 <q-item-section>
                                     <q-item-label>{{ customer.name }}</q-item-label>
-                                    <q-item-label caption> Pessoal {{ customer.person == "legal" ? "Jurídica" : "Física" }} </q-item-label>
+                                    <q-item-label caption> Pessoa {{ customer.person == "legal" ? "Jurídica" : "Física" }} </q-item-label>
                                 </q-item-section>
                             </q-item>
                         </UseMouseInElement>
