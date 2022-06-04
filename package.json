@@ -1,6 +1,6 @@
 {
     "name": "rai-invoices",
-    "version": "0.6.0",
+    "version": "0.7.0",
     "description": "Sistema para Gestão dos Recibos do Rainério",
     "productName": "Recibos do Rainério",
     "author": "Eduardo Donato <eduardo.donato@gmail.com>",
@@ -13,8 +13,8 @@
         "build": "quasar build",
         "build:pwa": "quasar build -m pwa",
         "test": "echo \"No test specified\" && exit 0",
-        "generate-icons": "icongenie generate -i ./public/logo.png --skip-trim --theme-color 006778",
-        "generate-icons:pwa": "icongenie generate -m pwa -i ./public/logo.png --skip-trim --theme-color 006778"
+        "generate-icons": "icongenie generate -i ./public/logo.png --skip-trim --theme-color 242f9b",
+        "generate-icons:pwa": "icongenie generate -m pwa -i ./public/logo.png --skip-trim --theme-color 242f9b"
     },
     "dependencies": {
         "@quasar/extras": "^1.0.0",

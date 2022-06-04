@@ -1,7 +1,12 @@
 <template>
     <q-layout view="lHh Lpr lFf">
         <q-header>
-            <q-toolbar class="bg-secondary">
+            <q-toolbar
+                :class="{
+                    'bg-secondary': !isDark,
+                    'bg-accent': isDark,
+                }"
+            >
                 <q-btn v-if="isHome" flat dense round icon="favorite" aria-label="Feito por" @click="onMadeBy" class="text-yellow">
                     <q-tooltip :delay="1000"> Feito por </q-tooltip>
                 </q-btn>
@@ -45,8 +50,8 @@
     </q-layout>
 </template>
 
-<script>
-import { defineComponent, ref, computed } from "vue"
+<script setup>
+import { ref, computed } from "vue"
 import { useQuasar } from "quasar"
 import { useRouter } from "vue-router"
 import { getAuth, signOut } from "firebase/auth"
@@ -54,60 +59,45 @@ import { updateAddressbarColors } from "boot/init"
 
 import MadeByDialog from "components/MadeByDialog.vue"
 
-export default defineComponent({
-    name: "MainLayout",
+const $q = useQuasar()
 
-    setup() {
-        const $q = useQuasar()
+const router = useRouter()
+const isHome = computed(() => router.currentRoute.value.name == "IndexPage")
 
-        const router = useRouter()
-        const isHome = computed(() => router.currentRoute.value.name == "IndexPage")
-
-        const auth = getAuth()
-        const logout = () => {
-            signOut(auth)
-                .then(() => {
-                    router.push({ name: "LoginPage" }).then(() => {
-                        $q.notify({
-                            type: "info",
-                            message: "Tchau!",
-                            caption: "Até brave",
-                        })
-                    })
+const auth = getAuth()
+const logout = () => {
+    signOut(auth)
+        .then(() => {
+            router.push({ name: "LoginPage" }).then(() => {
+                $q.notify({
+                    type: "info",
+                    message: "Tchau!",
+                    caption: "Até brave",
                 })
-                .catch((error) => {
-                    $q.notify({
-                        type: "negative",
-                        message: "Erro ao sair",
-                        caption: error.message,
-                    })
-                })
-        }
+            })
+        })
+        .catch((error) => {
+            $q.notify({
+                type: "negative",
+                message: "Erro ao sair",
+                caption: error.message,
+            })
+        })
+}
 
-        const isDark = ref($q.dark.isActive)
-        const toggleTheme = () => {
-            isDark.value = !isDark.value
-            $q.dark.set(isDark.value)
-            $q.localStorage.set("isDark", isDark.value)
-            updateAddressbarColors(isDark.value)
-        }
+const isDark = ref($q.dark.isActive)
+const toggleTheme = () => {
+    isDark.value = !isDark.value
+    $q.dark.set(isDark.value)
+    $q.localStorage.set("isDark", isDark.value)
+    updateAddressbarColors(isDark.value)
+}
+const themeIcon = computed(() => (isDark.value ? "light_mode" : "dark_mode"))
+const themeLabel = computed(() => (isDark.value ? "Usar tema claro" : "Usar tema escuro"))
 
-        return {
-            isHome,
-
-            onMadeBy() {
-                $q.dialog({
-                    component: MadeByDialog,
-                })
-            },
-
-            logout,
-
-            isDark,
-            toggleTheme,
-            themeIcon: computed(() => (isDark.value ? "light_mode" : "dark_mode")),
-            themeLabel: computed(() => (isDark.value ? "Usar tema claro" : "Usar tema escuro")),
-        }
-    },
-})
+const onMadeBy = () => {
+    $q.dialog({
+        component: MadeByDialog,
+    })
+}
 </script>

@@ -36,45 +36,30 @@
     </q-form>
 </template>
 
-<script>
-import { defineComponent, ref } from "vue"
+<script setup>
+import { ref } from "vue"
 import { useQuasar } from "quasar"
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth"
 
-export default defineComponent({
-    name: "LoginCard",
-    setup() {
-        const $q = useQuasar()
+const $q = useQuasar()
 
-        const email = ref("")
-        const password = ref("")
-        const isPwd = ref(true)
+const email = ref("")
+const password = ref("")
+const isPwd = ref(true)
 
-        const onSubmit = () => {
-            signInWithEmailAndPassword(getAuth(), email.value, password.value).catch((error) => {
-                console.error(error)
-                $q.notify({
-                    type: "negative",
-                    message: "Erro ao criar usuário",
-                    caption: error.message,
-                })
-            })
-        }
+const onSubmit = () => {
+    signInWithEmailAndPassword(getAuth(), email.value, password.value).catch((error) => {
+        console.error(error)
+        $q.notify({
+            type: "negative",
+            message: "Erro ao criar usuário",
+            caption: error.message,
+        })
+    })
+}
 
-        const onReset = () => {
-            email.value = ""
-            password.value = ""
-        }
-
-        return {
-            email,
-            password,
-            isPwd,
-            onSubmit,
-            onReset,
-        }
-    },
-})
+const onReset = () => {
+    email.value = ""
+    password.value = ""
+}
 </script>
-
-<style lang="scss" scoped></style>

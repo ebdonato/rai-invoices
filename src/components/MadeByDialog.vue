@@ -39,24 +39,17 @@
     </q-dialog>
 </template>
 
-<script>
+<script setup>
 import { useDialogPluginComponent } from "quasar"
 import pkg from "../../package.json"
 
-export default {
-    emits: [...useDialogPluginComponent.emits],
+defineEmits([...useDialogPluginComponent.emits])
 
-    setup() {
-        const { dialogRef, onDialogHide, onDialogOK } = useDialogPluginComponent()
+const { dialogRef, onDialogHide, onDialogOK } = useDialogPluginComponent()
 
-        return {
-            version: `v${pkg.version}`,
-            dialogRef,
-            onDialogHide,
-            onOKClick() {
-                onDialogOK()
-            },
-        }
-    },
+const version = `v${pkg.version}`
+
+const onOKClick = () => {
+    onDialogOK()
 }
 </script>

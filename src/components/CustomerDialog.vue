@@ -7,7 +7,7 @@
                     <div class="text-h6">Cliente</div>
                 </q-card-section>
 
-                <q-card-section class="q-mt-sm">
+                <q-card-section class="q-gutter-sm q-mt-sm">
                     <q-input outlined v-model="customer.name" label="Nome" :rules="[(val) => !!val || 'Campo Obrigatório']" @update:model-value="touched = true" />
                     <q-select
                         outlined
@@ -32,7 +32,6 @@
                     <q-input outlined v-model="customer.phone" label="Telefone" :rules="[() => true]" mask="(##) #####-####" unmasked-value @update:model-value="touched = true" />
                 </q-card-section>
 
-                <!-- buttons example -->
                 <q-card-actions align="right">
                     <q-btn v-if="isUpdatingCustomer" color="red" label="Excluir" @click.prevent="onDelete" />
                     <q-space />

@@ -13,14 +13,6 @@
     </q-page>
 </template>
 
-<script>
-import { defineComponent } from "vue"
-
-export default defineComponent({
-    name: "IndexPage",
-})
-</script>
-
 <style lang="scss" scoped>
 .button {
     width: 170px;

@@ -56,102 +56,87 @@
     </q-page>
 </template>
 
-<script>
-import { defineComponent, ref, onMounted, onUnmounted } from "vue"
+<script setup>
+import { ref, onMounted, onUnmounted } from "vue"
 import { useQuasar } from "quasar"
+
 import { getFirestore, collection, query, where, orderBy, limit, onSnapshot } from "firebase/firestore"
 import { getAuth } from "firebase/auth"
+
 import { formatCPForCNPJ, formatPhone } from "assets/customFormatters"
 
 import CustomerDialog from "components/CustomerDialog.vue"
 
-export default defineComponent({
-    name: "CustomersPage",
-    setup() {
-        const $q = useQuasar()
+const $q = useQuasar()
 
-        const db = getFirestore($q.firebaseApp)
+const db = getFirestore($q.firebaseApp)
 
-        const customers = ref([])
-        const filter = ref("")
-        let unsubscribe = null
+const customers = ref([])
+const filter = ref("")
+let unsubscribe = null
 
-        const user = getAuth().currentUser
-        const collectionRef = collection(db, `users/${user.uid}/customers`)
+const user = getAuth().currentUser
+const collectionRef = collection(db, `users/${user.uid}/customers`)
 
-        const onQueryData = () => {
-            $q.loading.show()
+const onQueryData = () => {
+    $q.loading.show()
 
-            unsubscribe?.()
+    unsubscribe?.()
 
-            const q = query(collectionRef, orderBy("name"), limit(20), where("name", ">=", filter.value), where("name", "<=", filter.value + "~"))
+    const q = query(collectionRef, orderBy("name"), limit(20), where("name", ">=", filter.value), where("name", "<=", filter.value + "~"))
 
-            const querySnapshot = (querySnapshot) => {
-                const firestoreData = []
-                querySnapshot.forEach((doc) => {
-                    const { name, contact, phone, person, nationalRegistration } = doc.data()
+    const querySnapshot = (querySnapshot) => {
+        const firestoreData = []
+        querySnapshot.forEach((doc) => {
+            const { name, contact, phone, person, nationalRegistration } = doc.data()
 
-                    firestoreData.push({
-                        id: doc.id,
-                        person,
-                        name,
-                        nationalRegistration: formatCPForCNPJ(nationalRegistration),
-                        contact,
-                        phone: formatPhone(phone),
-                    })
-                })
-
-                customers.value = [...firestoreData]
-
-                $q.loading.hide()
-            }
-
-            unsubscribe = onSnapshot(q, querySnapshot)
-        }
-
-        const onCancelFilter = () => {
-            filter.value = ""
-            onQueryData()
-        }
-
-        const onEdit = (_, id) => {
-            $q.dialog({
-                component: CustomerDialog,
-                componentProps: {
-                    id,
-                },
+            firestoreData.push({
+                id: doc.id,
+                person,
+                name,
+                nationalRegistration: formatCPForCNPJ(nationalRegistration),
+                contact,
+                phone: formatPhone(phone),
             })
-        }
-
-        const onNew = () => {
-            $q.dialog({
-                component: CustomerDialog,
-            })
-        }
-
-        onMounted(() => {
-            const customerFilterString = $q.localStorage.getItem("customerFilterString")
-
-            filter.value = customerFilterString?.filter ?? ""
-
-            onQueryData()
         })
 
-        onUnmounted(() => {
-            unsubscribe?.()
-        })
+        customers.value = [...firestoreData]
 
-        return {
-            formatCPForCNPJ,
-            isDark: ref($q.dark.isActive),
+        $q.loading.hide()
+    }
 
-            customers,
-            filter,
-            onQueryData,
-            onCancelFilter,
-            onEdit,
-            onNew,
-        }
-    },
+    unsubscribe = onSnapshot(q, querySnapshot)
+}
+
+const onCancelFilter = () => {
+    filter.value = ""
+    onQueryData()
+}
+
+const onEdit = (_, id) => {
+    $q.dialog({
+        component: CustomerDialog,
+        componentProps: {
+            id,
+        },
+    })
+}
+
+const onNew = () => {
+    $q.dialog({
+        component: CustomerDialog,
+    })
+}
+
+onMounted(() => {
+    const customerFilterString = $q.localStorage.getItem("customerFilterString")
+
+    filter.value = customerFilterString?.filter ?? ""
+
+    onQueryData()
+})
+
+onUnmounted(() => {
+    unsubscribe?.()
 })
 </script>

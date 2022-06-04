@@ -47,48 +47,32 @@
     </q-form>
 </template>
 
-<script>
-import { defineComponent, ref } from "vue"
+<script setup>
+import { ref } from "vue"
 import { useQuasar } from "quasar"
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth"
 
-export default defineComponent({
-    name: "CreateUserCard",
-    setup() {
-        const $q = useQuasar()
+const $q = useQuasar()
 
-        const email = ref("")
-        const password = ref("")
-        const passwordConfirmation = ref("")
-        const isPwd = ref(true)
+const email = ref("")
+const password = ref("")
+const passwordConfirmation = ref("")
+const isPwd = ref(true)
 
-        const onSubmit = () => {
-            createUserWithEmailAndPassword(getAuth(), email.value, password.value).catch((error) => {
-                console.error(error)
-                $q.notify({
-                    type: "negative",
-                    message: "Erro ao criar usuário",
-                    caption: error.message,
-                })
-            })
-        }
+const onSubmit = () => {
+    createUserWithEmailAndPassword(getAuth(), email.value, password.value).catch((error) => {
+        console.error(error)
+        $q.notify({
+            type: "negative",
+            message: "Erro ao criar usuário",
+            caption: error.message,
+        })
+    })
+}
 
-        const onReset = () => {
-            email.value = ""
-            password.value = ""
-            passwordConfirmation.value = ""
-        }
-
-        return {
-            email,
-            password,
-            passwordConfirmation,
-            isPwd,
-            onSubmit,
-            onReset,
-        }
-    },
-})
+const onReset = () => {
+    email.value = ""
+    password.value = ""
+    passwordConfirmation.value = ""
+}
 </script>
-
-<style lang="scss" scoped></style>

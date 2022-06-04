@@ -33,51 +33,37 @@
     </q-page>
 </template>
 
-<script>
-import { defineComponent, ref } from "vue"
+<script setup>
+import { ref } from "vue"
 import { useQuasar } from "quasar"
 import { useRouter } from "vue-router"
 import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth"
+
 import CreateUserCard from "components/CreateUserCard.vue"
 import LoginCard from "components/LoginCard.vue"
 
-export default defineComponent({
-    name: "LoginPage",
-    components: {
-        LoginCard,
-        CreateUserCard,
-    },
-    setup() {
-        const $q = useQuasar()
-        const router = useRouter()
+const $q = useQuasar()
 
-        const isDark = ref($q.dark.isActive)
+const router = useRouter()
 
-        const isCreatingUser = ref(false)
+const isDark = ref($q.dark.isActive)
 
-        const provider = new GoogleAuthProvider()
-        const signIn = () => {
-            signInWithPopup(getAuth(), provider)
-                .then(() => {
-                    router.push({ name: "IndexPage" })
-                })
-                .catch((error) => {
-                    console.error(error)
-                    $q.notify({
-                        type: "negative",
-                        message: "Erro ao entrar",
-                        caption: error.message,
-                    })
-                })
-        }
+const isCreatingUser = ref(false)
 
-        return {
-            isDark,
+const provider = new GoogleAuthProvider()
 
-            signIn,
-
-            isCreatingUser,
-        }
-    },
-})
+const signIn = () => {
+    signInWithPopup(getAuth(), provider)
+        .then(() => {
+            router.push({ name: "IndexPage" })
+        })
+        .catch((error) => {
+            console.error(error)
+            $q.notify({
+                type: "negative",
+                message: "Erro ao entrar",
+                caption: error.message,
+            })
+        })
+}
 </script>
