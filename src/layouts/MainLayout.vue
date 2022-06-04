@@ -44,7 +44,11 @@
                     'bg-dark': isDark,
                 }"
             >
-                <router-view />
+                <router-view v-slot="{ Component, route }">
+                    <transition mode="out-in" enter-active-class="animated fadeIn" leave-active-class="animated fadeOut" :duration="300">
+                        <component :is="Component" :key="route.path" />
+                    </transition>
+                </router-view>
             </div>
         </q-page-container>
     </q-layout>

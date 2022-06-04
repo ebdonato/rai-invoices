@@ -1,5 +1,4 @@
 <template>
-    <!-- notice dialogRef here -->
     <q-dialog ref="dialogRef" @hide="onDialogHide" persistent>
         <q-card class="q-dialog-plugin">
             <q-form @submit="onSubmit">
@@ -43,205 +42,170 @@
     </q-dialog>
 </template>
 
-<script>
+<script setup>
 import { useDialogPluginComponent, useQuasar } from "quasar"
 import { getFirestore, doc, getDoc, setDoc, deleteDoc } from "firebase/firestore"
 import { getAuth } from "firebase/auth"
 import { ref, onMounted } from "vue"
 import { nanoid } from "nanoid"
 
-export default {
-    name: "CustomerDialog",
+defineEmits([...useDialogPluginComponent.emits])
 
-    props: {
-        id: {
-            type: String,
-            required: false,
-            default: null,
-        },
+const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent()
+
+const $q = useQuasar()
+
+const personOptions = [
+    {
+        label: "Física",
+        value: "natural",
     },
+    {
+        label: "Jurídica",
+        value: "legal",
+    },
+]
 
-    emits: [
-        // REQUIRED; need to specify some events that your
-        // component will emit through useDialogPluginComponent()
-        ...useDialogPluginComponent.emits,
-    ],
+const customer = ref({ name: "", contact: "", phone: "", person: "legal", nationalRegistration: "" })
 
-    setup(props) {
-        // REQUIRED; must be called inside of setup()
-        const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent()
-        // dialogRef      - Vue ref to be applied to QDialog
-        // onDialogHide   - Function to be used as handler for @hide on QDialog
-        // onDialogOK     - Function to call to settle dialog with "ok" outcome
-        //                    example: onDialogOK() - no payload
-        //                    example: onDialogOK({ /*.../* }) - with payload
-        // onDialogCancel - Function to call to settle dialog with "cancel" outcome
-        const $q = useQuasar()
+const touched = ref(false)
 
-        const customer = ref({ name: "", contact: "", phone: "", person: "legal", nationalRegistration: "" })
+const db = getFirestore($q.firebaseApp)
 
-        const touched = ref(false)
+const user = getAuth().currentUser
 
-        const db = getFirestore($q.firebaseApp)
+const customersPath = `users/${user.uid}/customers`
 
-        const user = getAuth().currentUser
+const props = defineProps({
+    id: {
+        type: String,
+        required: false,
+        default: null,
+    },
+})
 
-        const customersPath = `users/${user.uid}/customers`
+const isUpdatingCustomer = !!props.id
 
-        const getCustomer = (id) => {
-            const docRef = doc(db, customersPath, id)
+const getCustomer = (id) => {
+    const docRef = doc(db, customersPath, id)
 
-            $q.loading.show()
+    $q.loading.show()
 
-            getDoc(docRef)
-                .then((docSnap) => {
-                    if (docSnap.exists()) {
-                        const { name, contact, phone, person, nationalRegistration } = docSnap.data()
-                        customer.value = {
-                            name,
-                            contact,
-                            phone,
-                            person,
-                            nationalRegistration,
-                        }
-                    } else {
-                        // doc.data() will be undefined in this case
-                        throw new Error("Documento não encontrado!")
-                    }
-                })
-                .catch((error) => {
-                    $q.notify({
-                        type: "negative",
-                        message: "Erro ao obter dados",
-                        caption: error.message,
-                    })
-                    onDialogCancel()
-                })
-                .finally(() => {
-                    $q.loading.hide()
-                })
-        }
-
-        const onSubmit = () => {
-            $q.loading.show()
-
-            const docRef = doc(db, customersPath, props.id ?? nanoid())
-
-            const document = {
-                name: customer.value.name,
-                contact: customer.value.contact,
-                phone: customer.value.phone,
-                person: customer.value.person,
-                nationalRegistration: customer.value.nationalRegistration,
-            }
-
-            setDoc(docRef, document)
-                .then(() => {
-                    $q.notify({
-                        type: "positive",
-                        message: props.id ? "Cliente atualizado com sucesso" : "Cliente cadastrado com sucesso",
-                    })
-                    onDialogOK()
-                })
-                .catch((error) => {
-                    $q.notify({
-                        type: "negative",
-                        message: "Erro ao obter dados",
-                        caption: error.message,
-                    })
-                })
-                .finally(() => {
-                    $q.loading.hide()
-                })
-        }
-
-        const onDelete = () => {
-            if (!props.id) return
-
-            $q.dialog({
-                title: "Excluir?",
-                message: "A exclusão não poderá ser desfeita",
-                cancel: true,
-                persistent: true,
-            }).onOk(() => {
-                $q.loading.show()
-
-                const docRef = doc(db, customersPath, props.id)
-
-                deleteDoc(docRef)
-                    .then(() => {
-                        $q.notify({
-                            type: "positive",
-                            message: "Cliente excluído com sucesso",
-                        })
-                        onDialogOK()
-                    })
-                    .catch((error) => {
-                        $q.notify({
-                            type: "negative",
-                            message: "Erro ao excluir dados",
-                            caption: error.message,
-                        })
-                    })
-                    .finally(() => {
-                        $q.loading.hide()
-                    })
-            })
-        }
-
-        onMounted(() => {
-            props.id && getCustomer(props.id)
-        })
-
-        return {
-            touched,
-            personOptions: [
-                {
-                    label: "Física",
-                    value: "natural",
-                },
-                {
-                    label: "Jurídica",
-                    value: "legal",
-                },
-            ],
-
-            customer,
-            onSubmit,
-            onDelete,
-            isUpdatingCustomer: !!props.id,
-            // This is REQUIRED;
-            // Need to inject these (from useDialogPluginComponent() call)
-            // into the vue scope for the vue html template
-            dialogRef,
-            onDialogHide,
-
-            // other methods that we used in our vue html template;
-            // these are part of our example (so not required)
-            onOKClick() {
-                // on OK, it is REQUIRED to
-                // call onDialogOK (with optional payload)
-                onDialogOK()
-                // or with payload: onDialogOK({ ... })
-                // ...and it will also hide the dialog automatically
-            },
-
-            // we can passthrough onDialogCancel directly
-            onCancelClick() {
-                if (touched.value) {
-                    $q.dialog({
-                        title: "Cancelar?",
-                        message: "Todos as modificações serão perdidas",
-                        cancel: true,
-                        persistent: true,
-                    }).onOk(() => {
-                        onDialogCancel()
-                    })
-                } else {
-                    onDialogCancel()
+    getDoc(docRef)
+        .then((docSnap) => {
+            if (docSnap.exists()) {
+                const { name, contact, phone, person, nationalRegistration } = docSnap.data()
+                customer.value = {
+                    name,
+                    contact,
+                    phone,
+                    person,
+                    nationalRegistration,
                 }
-            },
-        }
-    },
+            } else {
+                // doc.data() will be undefined in this case
+                throw new Error("Documento não encontrado!")
+            }
+        })
+        .catch((error) => {
+            onDialogCancel()
+
+            $q.notify({
+                type: "negative",
+                message: "Erro ao obter dados",
+                caption: error.message,
+            })
+        })
+        .finally(() => {
+            $q.loading.hide()
+        })
 }
+
+const onSubmit = () => {
+    $q.loading.show()
+
+    const docRef = doc(db, customersPath, props.id ?? nanoid())
+
+    const document = {
+        name: customer.value.name,
+        contact: customer.value.contact,
+        phone: customer.value.phone,
+        person: customer.value.person,
+        nationalRegistration: customer.value.nationalRegistration,
+    }
+
+    setDoc(docRef, document)
+        .then(() => {
+            onDialogOK()
+
+            $q.notify({
+                type: "positive",
+                message: props.id ? "Cliente atualizado com sucesso" : "Cliente cadastrado com sucesso",
+            })
+        })
+        .catch((error) => {
+            $q.notify({
+                type: "negative",
+                message: "Erro ao obter dados",
+                caption: error.message,
+            })
+        })
+        .finally(() => {
+            $q.loading.hide()
+        })
+}
+
+const onDelete = () => {
+    if (!props.id) return
+
+    $q.dialog({
+        title: "Excluir?",
+        message: "A exclusão não poderá ser desfeita",
+        cancel: true,
+        persistent: true,
+    }).onOk(() => {
+        $q.loading.show()
+
+        const docRef = doc(db, customersPath, props.id)
+
+        deleteDoc(docRef)
+            .then(() => {
+                onDialogOK()
+
+                $q.notify({
+                    type: "positive",
+                    message: "Cliente excluído com sucesso",
+                })
+            })
+            .catch((error) => {
+                $q.notify({
+                    type: "negative",
+                    message: "Erro ao excluir dados",
+                    caption: error.message,
+                })
+            })
+            .finally(() => {
+                $q.loading.hide()
+            })
+    })
+}
+
+const onCancelClick = () => {
+    if (touched.value) {
+        $q.dialog({
+            title: "Cancelar?",
+            message: "Todos as modificações serão perdidas",
+            cancel: true,
+            persistent: true,
+        }).onOk(() => {
+            onDialogCancel()
+        })
+    } else {
+        onDialogCancel()
+    }
+}
+
+onMounted(() => {
+    props.id && getCustomer(props.id)
+})
 </script>

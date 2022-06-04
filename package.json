@@ -1,6 +1,6 @@
 {
     "name": "rai-invoices",
-    "version": "0.7.0",
+    "version": "0.8.0",
     "description": "Sistema para Gestão dos Recibos do Rainério",
     "productName": "Recibos do Rainério",
     "author": "Eduardo Donato <eduardo.donato@gmail.com>",
@@ -18,6 +18,8 @@
     },
     "dependencies": {
         "@quasar/extras": "^1.0.0",
+        "@vueuse/components": "^8.6.0",
+        "@vueuse/core": "^8.6.0",
         "firebase": "^9.8.1",
         "nanoid": "^3.3.4",
         "quasar": "^2.6.0",

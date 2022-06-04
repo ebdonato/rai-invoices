@@ -20,16 +20,19 @@
                 </div>
                 <div class="row justify-between">
                     <q-card v-for="customer in customers" :key="customer.id" class="col-12 col-sm-5 q-mb-sm">
-                        <q-item clickable @click="onEdit($event, customer.id)">
-                            <q-item-section avatar>
-                                <q-icon size="xl" :name="customer.person == 'legal' ? 'business' : 'account_circle'" color="primary" />
-                            </q-item-section>
+                        <UseMouseInElement v-slot="{ isOutside }">
+                            <q-item clickable @click="onEdit($event, customer.id)">
+                                <q-tooltip :delay="1000"> Clique para editar ou excluir </q-tooltip>
+                                <q-item-section avatar>
+                                    <q-icon size="xl" :name="!isOutside ? 'edit' : customer.person == 'legal' ? 'business' : 'account_circle'" color="primary" />
+                                </q-item-section>
 
-                            <q-item-section>
-                                <q-item-label>{{ customer.name }}</q-item-label>
-                                <q-item-label caption> Pessoal {{ customer.person == "legal" ? "Jurídica" : "Física" }} </q-item-label>
-                            </q-item-section>
-                        </q-item>
+                                <q-item-section>
+                                    <q-item-label>{{ customer.name }}</q-item-label>
+                                    <q-item-label caption> Pessoal {{ customer.person == "legal" ? "Jurídica" : "Física" }} </q-item-label>
+                                </q-item-section>
+                            </q-item>
+                        </UseMouseInElement>
 
                         <q-item>
                             <q-item-section>
@@ -47,6 +50,7 @@
                         </q-item>
                     </q-card>
                 </div>
+
                 <div style="min-height: 60px"></div>
             </q-scroll-area>
         </div>
@@ -59,6 +63,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue"
 import { useQuasar } from "quasar"
+import { UseMouseInElement } from "@vueuse/components"
 
 import { getFirestore, collection, query, where, orderBy, limit, onSnapshot } from "firebase/firestore"
 import { getAuth } from "firebase/auth"
