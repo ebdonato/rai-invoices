@@ -39,9 +39,9 @@
             <q-separator />
 
             <q-card-actions>
-                <q-btn type="reset" color="primary">Limpar</q-btn>
+                <q-btn type="reset" color="primary" class="default-button">Limpar</q-btn>
                 <q-space />
-                <q-btn type="submit" color="primary">Criar</q-btn>
+                <q-btn type="submit" color="primary" class="default-button">Criar</q-btn>
             </q-card-actions>
         </q-card>
     </q-form>
