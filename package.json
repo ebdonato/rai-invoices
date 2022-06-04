@@ -9,12 +9,9 @@
         "lint": "eslint --ext .js,.vue ./",
         "format": "prettier --write \"**/*.{js,vue,scss,html,md,json}\" --ignore-path .gitignore",
         "start": "quasar dev",
-        "start:pwa": "quasar dev -m pwa",
         "build": "quasar build",
-        "build:pwa": "quasar build -m pwa",
-        "test": "echo \"No test specified\" && exit 0",
-        "generate-icons": "icongenie generate -i ./public/logo.png --skip-trim --theme-color 242f9b",
-        "generate-icons:pwa": "icongenie generate -m pwa -i ./public/logo.png --skip-trim --theme-color 242f9b"
+        "deploy": "firebase deploy",
+        "generate-icons": "icongenie generate -i ./public/logo.png --skip-trim --theme-color 242f9b"
     },
     "dependencies": {
         "@quasar/extras": "^1.0.0",
