@@ -18,8 +18,19 @@
                         map-options
                         lazy-rules
                         :rules="[(val) => !!val || 'Campo obrigatório.']"
+                        use-input
+                        @filter="onFilterCustomer"
                         @update:model-value="touched = true"
-                    />
+                    >
+                        <template v-slot:option="scope">
+                            <q-item v-bind="scope.itemProps">
+                                <q-item-section>
+                                    <q-item-label>{{ scope.opt.label }}</q-item-label>
+                                    <q-item-label caption>{{ scope.opt.caption }}</q-item-label>
+                                </q-item-section>
+                            </q-item>
+                        </template>
+                    </q-select>
                     <q-input
                         outlined
                         v-model="invoice.date"
@@ -185,19 +196,19 @@ const totalValue = () => {
     return invoice.items.reduce((acc, item) => acc + item.quantity * item.value, 0).toFixed(2)
 }
 
-const onQueryCostumers = async (filter = "") => {
+const queryCustomers = async (filter = "") => {
     const q = query(customerCollectionRef, orderBy("name"), limit(20), where("name", ">=", filter), where("name", "<=", filter + "~"))
 
     const querySnapshot = await getDocs(q)
 
-    customerOptions.value = []
+    const customer = []
 
     querySnapshot.forEach((doc) => {
         const { name, contact, phone, person, nationalRegistration: rawNationalRegistration } = doc.data()
 
         const nationalRegistration = formatCPForCNPJ(rawNationalRegistration)
 
-        customerOptions.value.push({
+        customer.push({
             label: name,
             caption: nationalRegistration || "- - -",
             value: {
@@ -210,6 +221,8 @@ const onQueryCostumers = async (filter = "") => {
             },
         })
     })
+
+    return [...customer]
 }
 
 const onAddItem = () => {
@@ -334,8 +347,18 @@ const onDelete = () => {
     })
 }
 
+const onFilterCustomer = (inputValue, doneFn, abortFn) => {
+    queryCustomers(inputValue)
+        .then((customers) => {
+            doneFn(() => (customerOptions.value = customers))
+        })
+        .catch(() => {
+            abortFn(() => (customerOptions.value = []))
+        })
+}
+
 onMounted(() => {
-    onQueryCostumers()
+    queryCustomers().then((customers) => (customerOptions.value = customers))
     props.id && getInvoice(props.id)
 })
 
