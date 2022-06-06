@@ -30,6 +30,12 @@ const routes = [
                 component: () => import("pages/InvoicesPage.vue"),
                 name: "InvoicesPage",
             },
+            {
+                path: "invoice/:id?",
+                component: () => import("pages/InvoicePage.vue"),
+                name: "InvoicePage",
+                props: true,
+            },
         ],
     },
 

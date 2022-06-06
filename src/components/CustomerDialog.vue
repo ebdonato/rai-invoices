@@ -31,8 +31,8 @@
                     <q-input outlined v-model="customer.phone" label="Telefone" :rules="[() => true]" mask="(##) #####-####" unmasked-value @update:model-value="touched = true" />
                 </q-card-section>
 
-                <q-card-actions align="right">
-                    <q-btn v-if="isUpdatingCustomer" color="red" label="Excluir" @click.prevent="onDelete" class="default-button" />
+                <q-card-actions>
+                    <q-btn v-if="!!props.id" color="red" label="Excluir" @click.prevent="onDelete" class="default-button" />
                     <q-space />
                     <q-btn color="primary" label="Cancel" @click.prevent="onCancelClick" class="default-button" />
                     <q-btn color="primary" label="OK" type="submit" class="default-button" />
@@ -84,8 +84,6 @@ const props = defineProps({
     },
 })
 
-const isUpdatingCustomer = !!props.id
-
 const getCustomer = (id) => {
     const docRef = doc(db, customersPath, id)
 
@@ -108,6 +106,8 @@ const getCustomer = (id) => {
             }
         })
         .catch((error) => {
+            console.error(error)
+
             onDialogCancel()
 
             $q.notify({
@@ -144,6 +144,8 @@ const onSubmit = () => {
             })
         })
         .catch((error) => {
+            console.error(error)
+
             $q.notify({
                 type: "negative",
                 message: "Erro ao obter dados",
@@ -178,6 +180,8 @@ const onDelete = () => {
                 })
             })
             .catch((error) => {
+                console.error(error)
+
                 $q.notify({
                     type: "negative",
                     message: "Erro ao excluir dados",

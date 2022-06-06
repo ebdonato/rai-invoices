@@ -64,6 +64,8 @@ export default boot(({ app, router }) => {
             router.push(app.redirectTo).then(() => {
                 app.redirectTo = null
             })
+        } else {
+            router.push("/")
         }
     })
 })

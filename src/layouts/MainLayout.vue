@@ -72,15 +72,15 @@ const auth = getAuth()
 const logout = () => {
     signOut(auth)
         .then(() => {
-            router.push({ name: "LoginPage" }).then(() => {
-                $q.notify({
-                    type: "info",
-                    message: "Tchau!",
-                    caption: "Até brave",
-                })
+            $q.notify({
+                type: "info",
+                message: "Tchau!",
+                caption: "Até brave",
             })
         })
         .catch((error) => {
+            console.error(error)
+
             $q.notify({
                 type: "negative",
                 message: "Erro ao sair",

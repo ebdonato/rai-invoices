@@ -50,6 +50,7 @@ const isPwd = ref(true)
 const onSubmit = () => {
     signInWithEmailAndPassword(getAuth(), email.value, password.value).catch((error) => {
         console.error(error)
+
         $q.notify({
             type: "negative",
             message: "Erro ao criar usuário",

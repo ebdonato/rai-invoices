@@ -21,7 +21,7 @@
                 <div class="row justify-between">
                     <q-card v-for="customer in customers" :key="customer.id" class="col-12 col-sm-5 q-mb-sm">
                         <UseMouseInElement v-slot="{ isOutside }">
-                            <q-item clickable @click="onEdit($event, customer.id)">
+                            <q-item clickable @click="onEdit(customer.id)">
                                 <q-tooltip :delay="1000"> Clique para editar ou excluir </q-tooltip>
                                 <q-item-section avatar>
                                     <q-icon size="xl" :name="!isOutside ? 'edit' : customer.person == 'legal' ? 'business' : 'account_circle'" color="primary" />
@@ -40,22 +40,22 @@
                                     <span class="text-weight-bold">{{ customer.person == "legal" ? "CNPJ " : "CPF " }}</span>
                                     <span>{{ formatCPForCNPJ(customer.nationalRegistration) }}</span>
                                 </q-item-label>
-                                <q-item-label
-                                    ><span class="text-weight-bold">Contato</span> <span>{{ customer.contact }}</span></q-item-label
-                                >
-                                <q-item-label
-                                    ><span class="text-weight-bold">Telefone</span> <span>{{ customer.phone }}</span></q-item-label
-                                >
+                                <q-item-label>
+                                    <span class="text-weight-bold">Contato</span> <span>{{ customer.contact }}</span>
+                                </q-item-label>
+                                <q-item-label>
+                                    <span class="text-weight-bold">Telefone</span> <span>{{ customer.phone }}</span>
+                                </q-item-label>
                             </q-item-section>
                         </q-item>
                     </q-card>
                 </div>
 
-                <div style="min-height: 60px"></div>
+                <div style="min-height: 70px"></div>
             </q-scroll-area>
         </div>
         <q-page-sticky position="bottom-right" :offset="[18, 18]">
-            <q-btn fab icon="add" color="secondary" @click="onNew" />
+            <q-btn fab icon="add" color="primary" @click="onNew" />
         </q-page-sticky>
     </q-page>
 </template>
@@ -118,7 +118,7 @@ const onCancelFilter = () => {
     onQueryData()
 }
 
-const onEdit = (_, id) => {
+const onEdit = (id) => {
     $q.dialog({
         component: CustomerDialog,
         componentProps: {

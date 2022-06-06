@@ -53,17 +53,14 @@ const isCreatingUser = ref(false)
 const provider = new GoogleAuthProvider()
 
 const signIn = () => {
-    signInWithPopup(getAuth(), provider)
-        .then(() => {
-            router.push({ name: "IndexPage" })
+    signInWithPopup(getAuth(), provider).catch((error) => {
+        console.error(error)
+
+        $q.notify({
+            type: "negative",
+            message: "Erro ao entrar",
+            caption: error.message,
         })
-        .catch((error) => {
-            console.error(error)
-            $q.notify({
-                type: "negative",
-                message: "Erro ao entrar",
-                caption: error.message,
-            })
-        })
+    })
 }
 </script>
