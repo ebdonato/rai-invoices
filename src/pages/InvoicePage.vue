@@ -259,7 +259,7 @@ const getInvoice = (id) => {
                 invoice.note = note
             } else {
                 // doc.data() will be undefined in this case
-                throw new Error("Documento não encontrado!")
+                throw new Error("Documento não encontrado")
             }
         })
         .catch((error) => {

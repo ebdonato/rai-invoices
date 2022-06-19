@@ -1,7 +1,8 @@
 <template>
     <q-page class="text-black bg-white" :dark="false">
-        <div v-if="!invoice.customerName || !info.name" class="column full-width">
-            <div class="column content-center">
+        <div v-if="!invoice.customerName || !info.name" class="column full-width content-center q-ma-xl">
+            <q-banner v-if="errorMessage" class="invoice-card text-white bg-red q-ma-xl" rounded=""> {{ errorMessage }} </q-banner>
+            <div v-else class="column content-center">
                 <q-img src="logo.svg" spinner-color="white" style="height: 140px; max-width: 150px" />
             </div>
             <div class="column content-center">Orçamento: {{ invoiceId }}</div>
@@ -10,22 +11,22 @@
             <q-card flat bordered :dark="false" class="invoice-card">
                 <q-card-section>
                     <div class="text-h2">{{ info.fantasyName || info.name }}</div>
-                    <div class="row q-gutter-md">
+                    <div class="row q-gutter-md" v-if="info.fantasyName || info.nationalRegistration">
                         <div v-if="info.fantasyName" class="text-h6">{{ info.name }}</div>
                         <div v-if="info.nationalRegistration" class="text-h6">{{ info.person == "legal" ? "CNPJ" : "CPF" }}: {{ formatCPForCNPJ(info.nationalRegistration) }}</div>
                     </div>
-                    <div class="row">
+                    <div class="row" v-if="info.addressLine1 || info.addressLine2 || info.city || info.state">
                         <div class="q-mr-md text-h5">
                             <q-icon name="business" />
                         </div>
                         <div>
-                            <div>{{ info.addressLine1 }}<span v-show="info.addressLine1 && info.addressLine2"> - </span>{{ info.addressLine2 }}</div>
-                            <div>{{ info.city }}<span v-show="info.city && info.state"> - </span>{{ info.state }}</div>
+                            <div>{{ info.addressLine1 }}<span v-if="info.addressLine1 && info.addressLine2"> - </span>{{ info.addressLine2 }}</div>
+                            <div>{{ info.city }}<span v-if="info.city && info.state"> - </span>{{ info.state }}</div>
                         </div>
                     </div>
                     <div class="row q-gutter-md">
-                        <div v-show="info.phone" class="text-h5"><q-icon name="perm_phone_msg" class="q-mr-sm" /> {{ formatPhone(info.phone) }}</div>
-                        <div v-show="info.email" class="text-h5"><q-icon name="mail" class="q-mr-sm" /> {{ info.email }}</div>
+                        <div v-if="info.phone" class="text-h5"><q-icon name="perm_phone_msg" class="q-mr-sm" /> {{ formatPhone(info.phone) }}</div>
+                        <div v-if="info.email" class="text-h5"><q-icon name="mail" class="q-mr-sm" /> {{ info.email }}</div>
                     </div>
                 </q-card-section>
             </q-card>
@@ -79,7 +80,7 @@
 </template>
 
 <script setup>
-import { reactive } from "vue"
+import { reactive, ref } from "vue"
 import { getFirestore, doc, getDoc } from "firebase/firestore"
 import { formatCPForCNPJ, formatPhone } from "assets/customFormatters"
 import { useQuasar, date } from "quasar"
@@ -97,6 +98,8 @@ const props = defineProps({
     },
 })
 
+const errorMessage = ref("")
+
 const db = getFirestore($q.firebaseApp)
 
 const invoice = reactive({})
@@ -109,9 +112,12 @@ const getInvoice = async () => {
     if (docSnap.exists()) {
         Object.assign(invoice, docSnap.data())
         invoice.dueDate = invoice.dueDate ?? defaultDueDate()
+        if (!invoice.customerName) {
+            throw new Error("Orçamento inválido")
+        }
     } else {
         // doc.data() will be undefined in this case
-        throw new Error("Orçamento não encontrado!")
+        throw new Error("Orçamento não encontrado")
     }
 }
 
@@ -135,9 +141,13 @@ const getInfo = async () => {
 
     if (docSnap.exists()) {
         Object.assign(info, docSnap.data())
+
+        if (!info.name) {
+            throw new Error("Informações não encontradas")
+        }
     } else {
         // doc.data() will be undefined in this case
-        throw new Error("Informações não encontradas!")
+        throw new Error("Informações não existem")
     }
 }
 
@@ -149,7 +159,7 @@ const loadData = async () => {
         await getInfo()
     } catch (error) {
         console.error(error)
-
+        errorMessage.value = error.message
         $q.notify({
             type: "negative",
             message: "Erro ao obter dados",

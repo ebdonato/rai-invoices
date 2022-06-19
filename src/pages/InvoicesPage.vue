@@ -100,9 +100,16 @@ const onLoad = () => {
             if (docSnap.exists()) {
                 const { name = "", fantasyName = "" } = docSnap.data()
                 userInfoName.value = fantasyName || name
+
+                if (!userInfoName.value) {
+                    throw new Error("Informações não encontradas")
+                }
             } else {
                 // doc.data() will be undefined in this case
-                throw new Error("Documento não encontrado!")
+                $q.notify({
+                    type: "warning",
+                    message: "Informações não existem",
+                })
             }
         })
         .catch((error) => {

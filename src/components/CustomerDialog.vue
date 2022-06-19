@@ -96,7 +96,7 @@ const getCustomer = (id) => {
                 Object.assign(customer, { name, contact, phone, person, nationalRegistration })
             } else {
                 // doc.data() will be undefined in this case
-                throw new Error("Documento não encontrado!")
+                throw new Error("Documento não encontrado")
             }
         })
         .catch((error) => {

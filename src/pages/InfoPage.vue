@@ -209,7 +209,10 @@ const onLoad = () => {
                 Object.assign(info, { name, fantasyName, zipCode, addressLine1, addressLine2, city, state, person, nationalRegistration, phone, email })
             } else {
                 // doc.data() will be undefined in this case
-                throw new Error("Documento não encontrado!")
+                $q.notify({
+                    type: "warning",
+                    message: "Informações não existem",
+                })
             }
         })
         .catch((error) => {
