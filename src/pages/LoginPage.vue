@@ -7,7 +7,7 @@
         }"
         padding=""
     >
-        <div class="text-h4 text-white">Recibos do Rainério</div>
+        <div class="text-h4 text-white">Orçamentos do Rainério</div>
         <div class="column align-center medium">
             <div v-if="isCreatingUser" class="q-gutter-sm column">
                 <CreateUserCard />
@@ -36,15 +36,12 @@
 <script setup>
 import { ref } from "vue"
 import { useQuasar } from "quasar"
-import { useRouter } from "vue-router"
 import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth"
 
 import CreateUserCard from "components/CreateUserCard.vue"
 import LoginCard from "components/LoginCard.vue"
 
 const $q = useQuasar()
-
-const router = useRouter()
 
 const isDark = ref($q.dark.isActive)
 
@@ -53,14 +50,20 @@ const isCreatingUser = ref(false)
 const provider = new GoogleAuthProvider()
 
 const signIn = () => {
-    signInWithPopup(getAuth(), provider).catch((error) => {
-        console.error(error)
+    $q.loading.show()
 
-        $q.notify({
-            type: "negative",
-            message: "Erro ao entrar",
-            caption: error.message,
+    signInWithPopup(getAuth(), provider)
+        .catch((error) => {
+            console.error(error)
+
+            $q.notify({
+                type: "negative",
+                message: "Erro ao entrar",
+                caption: error.message,
+            })
         })
-    })
+        .finally(() => {
+            $q.loading.hide()
+        })
 }
 </script>

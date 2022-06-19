@@ -3,11 +3,11 @@
         <q-card class="big">
             <q-form @submit="onSubmit">
                 <q-card-section class="bg-primary text-white">
-                    <div class="text-h6">Recibo</div>
+                    <div class="text-h6">Orçamento</div>
                     <div class="text-subtitle2">ID: {{ props.id ? props.id : "NOVO" }}</div>
                 </q-card-section>
 
-                <div class="q-pa-md row items-center justify-center q-gutter-md">
+                <div class="q-pa-md row items-start justify-center q-gutter-md">
                     <q-select
                         outlined
                         v-model="invoice.customer"
@@ -52,15 +52,7 @@
                             </q-icon>
                         </template>
                     </q-input>
-                    <q-input
-                        outlined
-                        v-model="invoice.dueDate"
-                        label="Data de Vencimento"
-                        class="items"
-                        lazy-rules
-                        :rules="[(val) => !!val || 'Campo obrigatório.']"
-                        @update:model-value="touched = true"
-                    >
+                    <q-input outlined v-model="invoice.dueDate" label="Data de Vencimento" class="items" @update:model-value="touched = true">
                         <template v-slot:append>
                             <q-icon name="event" class="cursor-pointer">
                                 <q-popup-proxy cover transition-show="scale" transition-hide="scale">
@@ -84,6 +76,8 @@
                     <q-space />
                     <div class="flex flex-center q-mx-md">Valor Total: R$ {{ totalValue() }}</div>
                 </q-card-section>
+
+                <q-banner v-if="!invoice.items.length" class="text-center text-black bg-grey-3 q-mt-sm q-mx-xl" rounded> Nenhum item adicionado. </q-banner>
 
                 <div v-for="(item, index) in invoice.items" :key="index" class="q-ma-xs">
                     <div class="row flex justify-center items-start col-grow q-gutter-sm q-my-xs">
@@ -135,8 +129,14 @@
                             </template>
                         </q-field>
                     </div>
-                    <q-separator inset />
+                    <q-separator inset v-show="invoice.items.length != index + 1" />
                 </div>
+
+                <q-card-section class="row bg-secondary text-white q-my-sm q-py-sm">
+                    <div class="text-h6">Observações</div>
+                </q-card-section>
+
+                <q-card-section> <q-editor v-model="invoice.note" placeholder="Sem Observações" min-height="5rem" @update:model-value="touched = true" /> </q-card-section>
 
                 <q-card-actions>
                     <q-btn v-if="!!props.id" color="red" label="Excluir" @click.prevent="onDelete" class="default-button" />
@@ -151,7 +151,7 @@
 
 <script setup>
 import { ref, reactive, onMounted } from "vue"
-import { useQuasar } from "quasar"
+import { useQuasar, date } from "quasar"
 import { onBeforeRouteLeave, useRouter } from "vue-router"
 
 import { getFirestore, collection, query, where, orderBy, limit, doc, getDoc, getDocs, setDoc, deleteDoc } from "firebase/firestore"
@@ -181,9 +181,10 @@ const props = defineProps({
 
 const invoice = reactive({
     customer: null,
-    date: null,
+    date: date.formatDate(Date.now(), "DD/MM/YYYY"),
     dueDate: null,
     items: [],
+    note: "",
 })
 
 const customerOptions = ref([])
@@ -215,9 +216,9 @@ const queryCustomers = async (filter = "") => {
                 id: doc.id,
                 person,
                 name,
-                nationalRegistration,
+                nationalRegistration: rawNationalRegistration,
                 contact,
-                phone: formatPhone(phone),
+                phone,
             },
         })
     })
@@ -249,12 +250,13 @@ const getInvoice = (id) => {
     getDoc(docRef)
         .then((docSnap) => {
             if (docSnap.exists()) {
-                const { customer, date, dueDate, items } = docSnap.data()
+                const { customer, date, dueDate, items = [], note = "" } = docSnap.data()
 
                 invoice.customer = customer
                 invoice.date = date
                 invoice.dueDate = dueDate
                 invoice.items = items
+                invoice.note = note
             } else {
                 // doc.data() will be undefined in this case
                 throw new Error("Documento não encontrado!")
@@ -291,7 +293,7 @@ const onSubmit = () => {
 
             $q.notify({
                 type: "positive",
-                message: props.id ? "Recibo atualizado com sucesso" : "Recibo cadastrado com sucesso",
+                message: props.id ? "Orçamento atualizado com sucesso" : "Orçamento cadastrado com sucesso",
             })
         })
         .catch((error) => {
@@ -329,7 +331,7 @@ const onDelete = () => {
 
                 $q.notify({
                     type: "positive",
-                    message: "Recibo excluído com sucesso",
+                    message: "Orçamento excluído com sucesso",
                 })
             })
             .catch((error) => {

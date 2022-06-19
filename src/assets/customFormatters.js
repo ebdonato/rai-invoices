@@ -6,7 +6,7 @@ export const formatCNPJ = (text) => text.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\
 
 export const formatCPForCNPJ = (text) => {
     const cleanedText = cleanText(text)
-    return cleanText(text).length <= 11 ? formatCPF(cleanedText) : formatCNPJ(cleanedText)
+    return cleanedText.length <= 11 ? formatCPF(cleanedText) : formatCNPJ(cleanedText)
 }
 
 export const formatPhone8Digits = (text) => text.replace(/(\d{2})(\d{4})(\d{4})/g, "($1) $2-$3")
@@ -15,5 +15,5 @@ export const formatPhone9Digits = (text) => text.replace(/(\d{2})(\d{5})(\d{4})/
 
 export const formatPhone = (text) => {
     const cleanedText = cleanText(text)
-    return cleanText(text).length <= 11 ? formatPhone9Digits(cleanedText) : formatPhone8Digits(cleanedText)
+    return cleanedText.length >= 11 ? formatPhone9Digits(cleanedText) : formatPhone8Digits(cleanedText)
 }

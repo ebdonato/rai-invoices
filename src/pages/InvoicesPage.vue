@@ -4,7 +4,7 @@
             <q-scroll-area style="height: 100%; width: 100%">
                 <div class="q-mb-sm">
                     <q-banner rounded inline-actions class="full-width text-white bg-primary">
-                        Recibos
+                        Orçamentos
                         <template v-slot:action>
                             <q-input color="secondary" dense v-model="filter" placeholder="Procurar" dark class="q-ml-sm" @keydown.enter="onQueryData">
                                 <q-tooltip :delay="1000"> Procurar por Empresa começando com ... </q-tooltip>
@@ -47,6 +47,10 @@
                                 </q-item-label>
                             </q-item-section>
                         </q-item>
+
+                        <q-card-actions align="right">
+                            <InvoiceAction :invoice-id="invoice.id" :user-id="user.uid" :userInfoName="userInfoName" />
+                        </q-card-actions>
                     </q-card>
                 </div>
 
@@ -65,8 +69,10 @@ import { useQuasar } from "quasar"
 import { UseMouseInElement } from "@vueuse/components"
 import { useRouter } from "vue-router"
 
-import { getFirestore, collection, query, where, orderBy, limit, onSnapshot } from "firebase/firestore"
+import { getFirestore, collection, query, where, orderBy, limit, onSnapshot, doc, getDoc } from "firebase/firestore"
 import { getAuth } from "firebase/auth"
+
+import InvoiceAction from "components/InvoiceAction.vue"
 
 const $q = useQuasar()
 
@@ -80,9 +86,34 @@ let unsubscribe = null
 
 const user = getAuth().currentUser
 const collectionRef = collection(db, `users/${user.uid}/invoices`)
+const userInfoRef = doc(db, "users", user.uid)
 
 const totalValue = (invoice) => {
     return invoice.items.reduce((acc, item) => acc + item.quantity * item.value, 0).toFixed(2)
+}
+
+const userInfoName = ref("")
+
+const onLoad = () => {
+    getDoc(userInfoRef)
+        .then((docSnap) => {
+            if (docSnap.exists()) {
+                const { name = "", fantasyName = "" } = docSnap.data()
+                userInfoName.value = fantasyName || name
+            } else {
+                // doc.data() will be undefined in this case
+                throw new Error("Documento não encontrado!")
+            }
+        })
+        .catch((error) => {
+            console.error(error)
+
+            $q.notify({
+                type: "negative",
+                message: "Erro ao obter dados",
+                caption: error.message,
+            })
+        })
 }
 
 const onQueryData = () => {
@@ -129,6 +160,8 @@ onMounted(() => {
     filter.value = invoiceFilterString?.filter ?? ""
 
     onQueryData()
+
+    onLoad()
 })
 
 onUnmounted(() => {

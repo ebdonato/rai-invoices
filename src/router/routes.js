@@ -12,6 +12,19 @@ const routes = [
     },
 
     {
+        path: "/pub/",
+        component: () => import("layouts/LandingLayout.vue"),
+        children: [
+            {
+                path: "u/:userId/i/:invoiceId",
+                component: () => import("pages/InvoicePublicPage.vue"),
+                name: "InvoicePublicPage",
+                props: true,
+            },
+        ],
+    },
+
+    {
         path: "/main",
         component: () => import("layouts/MainLayout.vue"),
         children: [
@@ -19,6 +32,11 @@ const routes = [
                 path: "",
                 component: () => import("pages/IndexPage.vue"),
                 name: "IndexPage",
+            },
+            {
+                path: "info",
+                component: () => import("pages/InfoPage.vue"),
+                name: "InfoPage",
             },
             {
                 path: "customers",

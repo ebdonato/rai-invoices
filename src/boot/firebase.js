@@ -14,7 +14,7 @@ const firebaseConfig = {
     measurementId: "G-X1MNYGDXN4",
 }
 
-const publicRoutesName = ["IndexPage"]
+const publicRoutesName = ["InvoicePublicPage"]
 
 // "async" is optional;
 // more info on params: https://v2.quasar.dev/quasar-cli/boot-files
@@ -27,17 +27,17 @@ export default boot(({ app, router }) => {
             return
         }
 
-        // acessar rota privada quando não tem usuário, é redirecionado para Login
-        if (!user && to.name != "LoginPage") {
-            if (to.fullPath) app.redirectTo = to.fullPath
-            next({ name: "LoginPage" })
-            return
-        }
-
         // acessar rota Login quando tem usuário, é cancelada a navegação
         // caso seja a rota de entrada, é redirecionado para Index
         if (user && to.name == "LoginPage") {
             next({ name: "IndexPage" })
+            return
+        }
+
+        // acessar rota privada quando não tem usuário, é redirecionado para Login
+        if (!user && to.name != "LoginPage") {
+            app.redirectTo = to.fullPath ?? "/main"
+            next({ name: "LoginPage" })
             return
         }
 
@@ -51,6 +51,8 @@ export default boot(({ app, router }) => {
     const firebaseAuth = getAuth()
 
     onAuthStateChanged(firebaseAuth, (user) => {
+        const atPublicRoute = publicRoutesName.includes(router.currentRoute.value.name)
+
         if (user) {
             // User is signed in, see docs for a list of available properties
             // https://firebase.google.com/docs/reference/js/firebase.User
@@ -59,13 +61,12 @@ export default boot(({ app, router }) => {
                 message: `Olá ${user.displayName ?? user.email}`,
             })
 
-            if (!app.redirectTo) app.redirectTo = "/main"
-
-            router.push(app.redirectTo).then(() => {
-                app.redirectTo = null
-            })
+            !atPublicRoute &&
+                router.push(app.redirectTo ?? "/main").then(() => {
+                    app.redirectTo = null
+                })
         } else {
-            router.push("/")
+            !atPublicRoute && router.push("/")
         }
     })
 })

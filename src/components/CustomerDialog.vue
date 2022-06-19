@@ -46,7 +46,7 @@
 import { useDialogPluginComponent, useQuasar } from "quasar"
 import { getFirestore, doc, getDoc, setDoc, deleteDoc } from "firebase/firestore"
 import { getAuth } from "firebase/auth"
-import { ref, onMounted } from "vue"
+import { ref, onMounted, reactive } from "vue"
 import { nanoid } from "nanoid"
 
 defineEmits([...useDialogPluginComponent.emits])
@@ -66,7 +66,7 @@ const personOptions = [
     },
 ]
 
-const customer = ref({ name: "", contact: "", phone: "", person: "legal", nationalRegistration: "" })
+const customer = reactive({ name: "", contact: "", phone: "", person: "legal", nationalRegistration: "" })
 
 const touched = ref(false)
 
@@ -92,14 +92,8 @@ const getCustomer = (id) => {
     getDoc(docRef)
         .then((docSnap) => {
             if (docSnap.exists()) {
-                const { name, contact, phone, person, nationalRegistration } = docSnap.data()
-                customer.value = {
-                    name,
-                    contact,
-                    phone,
-                    person,
-                    nationalRegistration,
-                }
+                const { name = "", contact = "", phone = "", person = "legal", nationalRegistration = "" } = docSnap.data()
+                Object.assign(customer, { name, contact, phone, person, nationalRegistration })
             } else {
                 // doc.data() will be undefined in this case
                 throw new Error("Documento não encontrado!")
@@ -127,11 +121,11 @@ const onSubmit = () => {
     const docRef = doc(db, customersPath, props.id ?? nanoid())
 
     const document = {
-        name: customer.value.name,
-        contact: customer.value.contact,
-        phone: customer.value.phone,
-        person: customer.value.person,
-        nationalRegistration: customer.value.nationalRegistration,
+        name: customer.name,
+        contact: customer.contact,
+        phone: customer.phone,
+        person: customer.person,
+        nationalRegistration: customer.nationalRegistration,
     }
 
     setDoc(docRef, document)

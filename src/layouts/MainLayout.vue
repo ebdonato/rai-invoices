@@ -5,6 +5,7 @@
                 :class="{
                     'bg-secondary': !isDark,
                     'bg-accent': isDark,
+                    'text-accent': !isDark,
                 }"
             >
                 <q-btn v-if="isHome" flat dense round icon="favorite" aria-label="Feito por" @click="onMadeBy" class="text-yellow">
@@ -15,7 +16,7 @@
                     <q-tooltip :delay="1000"> Início </q-tooltip>
                 </q-btn>
 
-                <q-toolbar-title> Recibos do Rainério </q-toolbar-title>
+                <q-toolbar-title> Orçamentos do Rainério </q-toolbar-title>
 
                 <div class="q-gutter-sm">
                     <q-btn flat dense round :icon="themeIcon" aria-label="Tema" @click="toggleTheme">
@@ -26,8 +27,8 @@
                         <q-tooltip :delay="1000"> Empresas </q-tooltip>
                     </q-btn>
 
-                    <q-btn flat dense round icon="receipt" aria-label="Recibos" :to="{ name: 'InvoicesPage' }">
-                        <q-tooltip :delay="1000"> Recibos </q-tooltip>
+                    <q-btn flat dense round icon="receipt" aria-label="Orçamentos" :to="{ name: 'InvoicesPage' }">
+                        <q-tooltip :delay="1000"> Orçamentos </q-tooltip>
                     </q-btn>
 
                     <q-btn flat dense round icon="logout" aria-label="Sair" @click="logout">

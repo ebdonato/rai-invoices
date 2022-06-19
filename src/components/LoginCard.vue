@@ -48,15 +48,21 @@ const password = ref("")
 const isPwd = ref(true)
 
 const onSubmit = () => {
-    signInWithEmailAndPassword(getAuth(), email.value, password.value).catch((error) => {
-        console.error(error)
+    $q.loading.show()
 
-        $q.notify({
-            type: "negative",
-            message: "Erro ao criar usuário",
-            caption: error.message,
+    signInWithEmailAndPassword(getAuth(), email.value, password.value)
+        .catch((error) => {
+            console.error(error)
+
+            $q.notify({
+                type: "negative",
+                message: "Erro ao criar usuário",
+                caption: error.message,
+            })
         })
-    })
+        .finally(() => {
+            $q.loading.hide()
+        })
 }
 
 const onReset = () => {
