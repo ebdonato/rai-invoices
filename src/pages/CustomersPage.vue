@@ -57,7 +57,10 @@
             </q-scroll-area>
         </div>
         <q-page-sticky position="bottom-right" :offset="[18, 18]">
-            <q-btn fab icon="add" color="primary" @click="onNew" />
+            <div class="q-gutter-sm">
+                <q-btn fab icon="arrow_back" color="primary" :to="{ name: 'IndexPage' }" />
+                <q-btn fab icon="add" color="primary" @click="onNew" />
+            </div>
         </q-page-sticky>
     </q-page>
 </template>

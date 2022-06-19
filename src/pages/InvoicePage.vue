@@ -77,7 +77,7 @@
                     <div class="flex flex-center q-mx-md">Valor Total: R$ {{ totalValue() }}</div>
                 </q-card-section>
 
-                <q-banner v-if="!invoice.items.length" class="text-center text-black bg-grey-3 q-mt-sm q-mx-xl" rounded> Nenhum item adicionado. </q-banner>
+                <div v-if="!invoice.items.length" class="text-center q-mt-sm">Nenhum item adicionado.</div>
 
                 <div v-for="(item, index) in invoice.items" :key="index" class="q-ma-xs">
                     <div class="row flex justify-center items-start col-grow q-gutter-sm q-my-xs">
