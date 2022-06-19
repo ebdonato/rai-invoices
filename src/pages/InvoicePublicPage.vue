@@ -1,14 +1,14 @@
 <template>
-    <q-page class="text-black bg-white" :dark="false">
-        <div v-if="!invoice.customerName || !info.name" class="column full-width content-center q-ma-xl">
+    <q-page class="text-black bg-white">
+        <div v-if="!invoice.customerName || !info.name" class="column full-width content-center">
             <q-banner v-if="errorMessage" class="invoice-card text-white bg-red q-ma-xl" rounded=""> {{ errorMessage }} </q-banner>
-            <div v-else class="column content-center">
+            <div v-else class="column content-center q-ma-xl">
                 <q-img src="logo.svg" spinner-color="white" style="height: 140px; max-width: 150px" />
             </div>
             <div class="column content-center">Orçamento: {{ invoiceId }}</div>
         </div>
         <div v-else class="column content-center q-pa-xs q-gutter-xs">
-            <q-card flat bordered :dark="false" class="invoice-card">
+            <q-card flat bordered :dark="false" class="invoice-card text-black bg-white">
                 <q-card-section class="q-pa-xs">
                     <div class="row q-gutter-sm">
                         <div class="col-grow text-h5">{{ info.fantasyName || info.name }}</div>
@@ -32,7 +32,7 @@
                     </div>
                 </q-card-section>
             </q-card>
-            <q-card flat bordered :dark="false" class="invoice-card">
+            <q-card flat bordered :dark="false" class="invoice-card text-black bg-white">
                 <q-card-section class="q-pa-xs">
                     <div>Orçamento: {{ invoiceId }}</div>
                     <div class="row">
@@ -45,7 +45,7 @@
                     </div>
                 </q-card-section>
             </q-card>
-            <q-card flat bordered :dark="false" class="invoice-card">
+            <q-card flat bordered :dark="false" class="invoice-card text-black bg-white">
                 <q-markup-table :dark="false" separator="cell" dense>
                     <thead>
                         <tr>
@@ -70,7 +70,7 @@
                     </tbody>
                 </q-markup-table>
             </q-card>
-            <q-card flat bordered :dark="false" class="invoice-card">
+            <q-card flat bordered :dark="false" class="invoice-card text-black bg-white">
                 <q-card-section class="row q-pa-xs align-start">
                     <div class="text-weight-medium q-mr-xs">Observações:</div>
                     <div v-if="!!invoice.note" v-html="$sanitize(invoice.note)" />

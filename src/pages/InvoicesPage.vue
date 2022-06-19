@@ -28,27 +28,30 @@
                                 </q-item-section>
 
                                 <q-item-section>
-                                    <q-item-label> Cliente {{ invoice.customer }}</q-item-label>
+                                    <q-item-label>
+                                        <span class="text-weight-bold">Cliente {{ invoice.customer }}</span>
+                                    </q-item-label>
                                     <q-item-label caption> Valor Total: R$ {{ totalValue(invoice) }}</q-item-label>
                                 </q-item-section>
                             </q-item>
                         </UseMouseInElement>
 
-                        <q-item>
-                            <q-item-section>
-                                <q-item-label>
-                                    <span class="text-weight-bold">Data</span> <span>{{ invoice.date }}</span>
-                                </q-item-label>
-                                <q-item-label>
-                                    <span class="text-weight-bold">Vencimento</span> <span>{{ invoice.dueDate }}</span>
-                                </q-item-label>
-                                <q-item-label>
-                                    <span class="text-weight-bold">Qtd. Items</span> <span>{{ invoice.items.length }}</span>
-                                </q-item-label>
-                            </q-item-section>
-                        </q-item>
+                        <q-card-section class="q-pa-sm">
+                            <div class="row">
+                                <div class="column q-mr-md">
+                                    <div class="col text-weight-bold">Data</div>
+                                    <div class="text-weight-bold">Vencimento</div>
+                                    <div class="text-weight-bold">Qtd. Items</div>
+                                </div>
+                                <div class="column">
+                                    <div class="col">{{ invoice.date }}</div>
+                                    <div>{{ invoice.dueDate }}</div>
+                                    <div>{{ invoice.items.length }}</div>
+                                </div>
+                            </div>
+                        </q-card-section>
 
-                        <q-card-actions align="right">
+                        <q-card-actions align="right" class="q-pa-sm">
                             <InvoiceAction :invoice-id="invoice.id" :user-id="user.uid" :userInfoName="userInfoName" />
                         </q-card-actions>
                     </q-card>

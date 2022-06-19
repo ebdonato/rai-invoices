@@ -1,6 +1,6 @@
 {
     "name": "rai-invoices",
-    "version": "0.11.4",
+    "version": "0.11.5",
     "description": "Sistema para Gestão dos Orçamentos do Rainério",
     "productName": "Orçamentos do Rainério",
     "author": "Eduardo Donato <eduardo.donato@gmail.com>",
@@ -11,7 +11,7 @@
         "start": "quasar dev",
         "build": "quasar build",
         "deploy": "firebase deploy",
-        "generate-icons": "icongenie generate -i ./public/logo.png --skip-trim --theme-color 242f9b"
+        "generate-icons": "icongenie generate -i ./public/logo.png --skip-trim --theme-color b25068"
     },
     "dependencies": {
         "@quasar/extras": "^1.0.0",

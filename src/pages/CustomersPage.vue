@@ -28,26 +28,28 @@
                                 </q-item-section>
 
                                 <q-item-section>
-                                    <q-item-label>{{ customer.name }}</q-item-label>
+                                    <q-item-label>
+                                        <span class="text-weight-bold">{{ customer.name }}</span>
+                                    </q-item-label>
                                     <q-item-label caption> Pessoa {{ customer.person == "legal" ? "Jurídica" : "Física" }} </q-item-label>
                                 </q-item-section>
                             </q-item>
                         </UseMouseInElement>
 
-                        <q-item>
-                            <q-item-section>
-                                <q-item-label>
-                                    <span class="text-weight-bold">{{ customer.person == "legal" ? "CNPJ " : "CPF " }}</span>
-                                    <span>{{ formatCPForCNPJ(customer.nationalRegistration) }}</span>
-                                </q-item-label>
-                                <q-item-label>
-                                    <span class="text-weight-bold">Contato</span> <span>{{ customer.contact }}</span>
-                                </q-item-label>
-                                <q-item-label>
-                                    <span class="text-weight-bold">Telefone</span> <span>{{ customer.phone }}</span>
-                                </q-item-label>
-                            </q-item-section>
-                        </q-item>
+                        <q-card-section class="q-pa-sm">
+                            <div class="row">
+                                <div class="column q-mr-md">
+                                    <div class="col text-weight-bold">{{ customer.person == "legal" ? "CNPJ " : "CPF " }}</div>
+                                    <div class="text-weight-bold">Contato</div>
+                                    <div class="text-weight-bold">Telefone</div>
+                                </div>
+                                <div class="column">
+                                    <div class="col">{{ formatCPForCNPJ(customer.nationalRegistration) }}</div>
+                                    <div>{{ customer.contact }}</div>
+                                    <div>{{ customer.phone }}</div>
+                                </div>
+                            </div>
+                        </q-card-section>
                     </q-card>
                 </div>
 

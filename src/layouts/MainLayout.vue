@@ -5,7 +5,6 @@
                 :class="{
                     'bg-secondary': !isDark,
                     'bg-accent': isDark,
-                    'text-accent': !isDark,
                 }"
             >
                 <q-btn v-if="isHome" flat dense round icon="favorite" aria-label="Feito por" @click="onMadeBy" class="text-yellow">
