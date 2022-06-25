@@ -1,6 +1,6 @@
 {
     "name": "rai-invoices",
-    "version": "0.11.6",
+    "version": "0.11.7",
     "description": "Sistema para Gestão dos Orçamentos do Rainério",
     "productName": "Orçamentos do Rainério",
     "author": "Eduardo Donato <eduardo.donato@gmail.com>",
@@ -17,6 +17,7 @@
         "@quasar/extras": "^1.0.0",
         "@vueuse/components": "^8.6.0",
         "@vueuse/core": "^8.6.0",
+        "cpf-cnpj-validator": "^1.0.3",
         "firebase": "^9.8.1",
         "nanoid": "^3.3.4",
         "quasar": "^2.6.0",

@@ -22,7 +22,7 @@
                         outlined
                         v-model="customer.nationalRegistration"
                         :label="customer.person == 'legal' ? 'CNPJ' : 'CPF'"
-                        :rules="[() => true]"
+                        :rules="[(val) => !val || cpf.isValid(val) || cnpj.isValid(val) || 'Número Inválido']"
                         :mask="customer.person == 'legal' ? '##.###.###/####-##' : '###.###.###-##'"
                         unmasked-value
                         @update:model-value="touched = true"
@@ -48,6 +48,7 @@ import { getFirestore, doc, getDoc, setDoc, deleteDoc } from "firebase/firestore
 import { getAuth } from "firebase/auth"
 import { ref, onMounted, reactive } from "vue"
 import { nanoid } from "nanoid"
+import { cpf, cnpj } from "cpf-cnpj-validator"
 
 defineEmits([...useDialogPluginComponent.emits])
 

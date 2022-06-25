@@ -30,6 +30,7 @@
                         outlined
                         v-model="info.nationalRegistration"
                         :label="info.person == 'legal' ? 'CNPJ' : 'CPF'"
+                        :rules="[(val) => !val || cpf.isValid(val) || cnpj.isValid(val) || 'Número Inválido']"
                         :mask="info.person == 'legal' ? '##.###.###/####-##' : '###.###.###-##'"
                         unmasked-value
                         @update:model-value="touched = true"
@@ -91,6 +92,8 @@ import { onBeforeRouteLeave, useRouter } from "vue-router"
 
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore"
 import { getAuth } from "firebase/auth"
+
+import { cpf, cnpj } from "cpf-cnpj-validator"
 
 const $q = useQuasar()
 
