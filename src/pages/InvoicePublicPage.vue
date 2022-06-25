@@ -1,38 +1,15 @@
 <template>
     <q-page class="text-black bg-white">
-        <div v-if="!invoice.customerName || !info.name" class="column full-width content-center">
-            <q-banner v-if="errorMessage" class="invoice-card text-white bg-red q-ma-xl" rounded=""> {{ errorMessage }} </q-banner>
+        <div v-if="!invoice.customerName || errorMessage" class="column full-width content-center">
+            <q-banner v-if="errorMessage" class="print-card text-white bg-red q-ma-xl" rounded> {{ errorMessage }} </q-banner>
             <div v-else class="column content-center q-ma-xl">
                 <q-img src="logo.svg" spinner-color="white" style="height: 140px; max-width: 150px" />
             </div>
             <div class="column content-center">Orçamento: {{ invoiceId }}</div>
         </div>
         <div v-else class="column content-center q-pa-xs q-gutter-xs invoice">
-            <q-card flat bordered :dark="false" class="invoice-card">
-                <q-card-section class="q-pa-xs">
-                    <div class="row q-gutter-sm">
-                        <div class="col-grow text-h5">{{ info.fantasyName || info.name }}</div>
-                        <div class="self-end" v-if="info.fantasyName">{{ info.name }}</div>
-                        <div class="self-end" v-if="info.nationalRegistration">{{ info.person == "legal" ? "CNPJ" : "CPF" }}: {{ formatCPForCNPJ(info.nationalRegistration) }}</div>
-                    </div>
-                    <div class="row q-gutter-sm">
-                        <div class="row col" v-if="info.addressLine1 || info.addressLine2 || info.city || info.state">
-                            <div class="q-mr-sm">
-                                <q-icon name="business" />
-                            </div>
-                            <div>
-                                <div>{{ info.addressLine1 }}<span v-if="info.addressLine1 && info.addressLine2"> - </span>{{ info.addressLine2 }}</div>
-                                <div>{{ info.city }}<span v-if="info.city && info.state"> - </span>{{ info.state }}</div>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="text-right" v-if="info.phone"><q-icon name="perm_phone_msg" class="q-mr-sm" /> {{ formatPhone(info.phone) }}</div>
-                            <div class="text-right" v-if="info.email"><q-icon name="mail" class="q-mr-sm" /> {{ info.email }}</div>
-                        </div>
-                    </div>
-                </q-card-section>
-            </q-card>
-            <q-card flat bordered :dark="false" class="invoice-card">
+            <InfoPublicHeader :userId="userId" @error="(message) => (errorMessage = message)" />
+            <q-card flat bordered :dark="false" class="print-card">
                 <q-card-section class="q-pa-xs">
                     <div>Orçamento: {{ invoiceId }}</div>
                     <div class="row">
@@ -45,7 +22,7 @@
                     </div>
                 </q-card-section>
             </q-card>
-            <q-card flat bordered :dark="false" class="invoice-card" :style="{ 'flex-grow': '1' }">
+            <q-card flat bordered :dark="false" class="print-card" :style="{ 'flex-grow': '1' }">
                 <q-markup-table :dark="false" separator="cell" dense>
                     <thead>
                         <tr>
@@ -70,7 +47,7 @@
                     </tbody>
                 </q-markup-table>
             </q-card>
-            <q-card flat bordered :dark="false" class="invoice-card">
+            <q-card flat bordered :dark="false" class="print-card">
                 <q-card-section class="row q-pa-xs align-start">
                     <div class="text-weight-medium q-mr-xs">Observações:</div>
                     <div v-if="!!invoice.note" v-html="$sanitize(invoice.note)" />
@@ -84,8 +61,10 @@
 <script setup>
 import { reactive, ref } from "vue"
 import { getFirestore, doc, getDoc } from "firebase/firestore"
-import { formatCPForCNPJ, formatPhone } from "assets/customFormatters"
+import { formatCPForCNPJ } from "assets/customFormatters"
 import { useQuasar, date } from "quasar"
+
+import InfoPublicHeader from "components/InfoPublicHeader.vue"
 
 const $q = useQuasar()
 
@@ -101,6 +80,10 @@ const props = defineProps({
 })
 
 const errorMessage = ref("")
+
+const errorHandler = (message) => {
+    errorMessage.value = message
+}
 
 const db = getFirestore($q.firebaseApp)
 
@@ -134,31 +117,11 @@ const defaultDueDate = () => {
     return date.formatDate(dueDate, "DD/MM/YYYY")
 }
 
-const info = reactive({})
-
-const getInfo = async () => {
-    const docRef = doc(db, "users", props.userId)
-
-    const docSnap = await getDoc(docRef)
-
-    if (docSnap.exists()) {
-        Object.assign(info, docSnap.data())
-
-        if (!info.name) {
-            throw new Error("Informações não encontradas")
-        }
-    } else {
-        // doc.data() will be undefined in this case
-        throw new Error("Informações não existem")
-    }
-}
-
 const loadData = async () => {
     $q.loading.show()
 
     try {
         await getInvoice()
-        await getInfo()
     } catch (error) {
         console.error(error)
         errorMessage.value = error.message
@@ -188,10 +151,7 @@ loadData()
 .table-main-column {
     width: 70%;
 }
-.invoice-card {
-    width: 100%;
-    max-width: 800px;
-}
+
 .invoice {
     min-height: 50vh;
 }
