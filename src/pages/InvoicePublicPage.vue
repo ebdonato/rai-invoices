@@ -7,8 +7,8 @@
             </div>
             <div class="column content-center">Orçamento: {{ invoiceId }}</div>
         </div>
-        <div v-else class="column content-center q-pa-xs q-gutter-xs">
-            <q-card flat bordered :dark="false" class="invoice-card text-black bg-white">
+        <div v-else class="column content-center q-pa-xs q-gutter-xs invoice">
+            <q-card flat bordered :dark="false" class="invoice-card">
                 <q-card-section class="q-pa-xs">
                     <div class="row q-gutter-sm">
                         <div class="col-grow text-h5">{{ info.fantasyName || info.name }}</div>
@@ -32,7 +32,7 @@
                     </div>
                 </q-card-section>
             </q-card>
-            <q-card flat bordered :dark="false" class="invoice-card text-black bg-white">
+            <q-card flat bordered :dark="false" class="invoice-card">
                 <q-card-section class="q-pa-xs">
                     <div>Orçamento: {{ invoiceId }}</div>
                     <div class="row">
@@ -45,7 +45,7 @@
                     </div>
                 </q-card-section>
             </q-card>
-            <q-card flat bordered :dark="false" class="invoice-card text-black bg-white">
+            <q-card flat bordered :dark="false" class="invoice-card" :style="{ 'flex-grow': '1' }">
                 <q-markup-table :dark="false" separator="cell" dense>
                     <thead>
                         <tr>
@@ -70,7 +70,7 @@
                     </tbody>
                 </q-markup-table>
             </q-card>
-            <q-card flat bordered :dark="false" class="invoice-card text-black bg-white">
+            <q-card flat bordered :dark="false" class="invoice-card">
                 <q-card-section class="row q-pa-xs align-start">
                     <div class="text-weight-medium q-mr-xs">Observações:</div>
                     <div v-if="!!invoice.note" v-html="$sanitize(invoice.note)" />
@@ -191,5 +191,8 @@ loadData()
 .invoice-card {
     width: 100%;
     max-width: 800px;
+}
+.invoice {
+    min-height: 50vh;
 }
 </style>
