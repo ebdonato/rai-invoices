@@ -1,14 +1,14 @@
 // app global css in SCSS form
 .bg-light {
     background: $secondary !important;
-    background: -webkit-linear-gradient(to right, $secondary, $indigo-3) !important;
-    background: linear-gradient(to bottom, $secondary, $indigo-3) !important;
+    background: -webkit-linear-gradient(to right, $secondary, $purple-1) !important;
+    background: linear-gradient(to bottom, $secondary, $purple-1) !important;
 }
 
 .bg-dark {
     background: $accent !important;
-    background: -webkit-linear-gradient(to right, $accent, $indigo-10) !important;
-    background: linear-gradient(to bottom, $accent, $indigo-10) !important;
+    background: -webkit-linear-gradient(to right, $accent, $purple-10) !important;
+    background: linear-gradient(to bottom, $accent, $purple-10) !important;
 }
 
 .big {
