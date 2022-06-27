@@ -21,6 +21,12 @@ const routes = [
                 name: "InvoicePublicPage",
                 props: true,
             },
+            {
+                path: "u/:userId/r/:receiptId",
+                component: () => import("pages/ReceiptPublicPage.vue"),
+                name: "ReceiptPublicPage",
+                props: true,
+            },
         ],
     },
 
@@ -53,6 +59,11 @@ const routes = [
                 component: () => import("pages/InvoicePage.vue"),
                 name: "InvoicePage",
                 props: true,
+            },
+            {
+                path: "receipts",
+                component: () => import("pages/ReceiptsPage.vue"),
+                name: "ReceiptsPage",
             },
         ],
     },

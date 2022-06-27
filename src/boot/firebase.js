@@ -14,7 +14,7 @@ const firebaseConfig = {
     measurementId: "G-X1MNYGDXN4",
 }
 
-const publicRoutesName = ["InvoicePublicPage"]
+const publicRoutesName = ["InvoicePublicPage", "ReceiptPublicPage"]
 
 // "async" is optional;
 // more info on params: https://v2.quasar.dev/quasar-cli/boot-files

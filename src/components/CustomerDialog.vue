@@ -143,7 +143,7 @@ const onSubmit = () => {
 
             $q.notify({
                 type: "negative",
-                message: "Erro ao obter dados",
+                message: "Erro ao enviar dados",
                 caption: error.message,
             })
         })

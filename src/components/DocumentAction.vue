@@ -15,6 +15,7 @@
 </template>
 
 <script setup>
+import { computed } from "vue"
 import { useShare } from "@vueuse/core"
 import { copyToClipboard, openURL, useQuasar } from "quasar"
 
@@ -22,24 +23,22 @@ const { share, isSupported } = useShare()
 
 const $q = useQuasar()
 
-const url = `${location.protocol}//${location.host}/#/pub/u/${props.userId}/i/${props.invoiceId}`
-
 function startShare() {
-    const title = `Orçamento ${props.userInfoName ? "de" : ""} ${props.userInfoName}`
+    const title = `${docName.value} ${props.userInfoName ? "de" : ""} ${props.userInfoName}`
 
     share({
         title,
-        text: `Orçamento ID: ${props.invoiceId}`,
-        url,
+        text: `${docName.value} ID: ${props.docId}`,
+        url: url.value,
     })
 }
 
 function openLink() {
-    openURL(url)
+    openURL(url.value)
 }
 
 function copyLink() {
-    copyToClipboard(url)
+    copyToClipboard(url.value)
         .then(() => {
             $q.notify({
                 type: "positive",
@@ -55,9 +54,17 @@ function copyLink() {
 }
 
 const props = defineProps({
-    invoiceId: {
+    docId: {
         type: String,
         required: true,
+    },
+    docType: {
+        type: String,
+        required: false,
+        default: "invoice",
+        validator(value) {
+            return ["invoice", "receipt"].includes(value)
+        },
     },
     userId: {
         type: String,
@@ -68,6 +75,24 @@ const props = defineProps({
         required: false,
         default: "",
     },
+})
+
+const docName = computed(() => {
+    const docTypeTranslateToName = {
+        invoice: "Orçamento",
+        receipt: "Recibo",
+    }
+
+    return docTypeTranslateToName[props.docType] ?? "Orçamento"
+})
+
+const url = computed(() => {
+    const docTypeTranslateToUrlPart = {
+        invoice: "i",
+        receipt: "r",
+    }
+
+    return `${location.protocol}//${location.host}/#/pub/u/${props.userId}/${docTypeTranslateToUrlPart[props.docType] ?? "i"}/${props.docId}`
 })
 </script>
 

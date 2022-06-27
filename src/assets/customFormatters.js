@@ -17,3 +17,13 @@ export const formatPhone = (text) => {
     const cleanedText = cleanText(text)
     return cleanedText.length >= 11 ? formatPhone9Digits(cleanedText) : formatPhone8Digits(cleanedText)
 }
+
+export const formatLocal = (city, state) => (city && state ? `${city}/${state}` : "")
+
+const numberCurrencyFormat = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" })
+
+const numberFormat = new Intl.NumberFormat("pt-BR")
+
+export const formatCurrency = (value) => numberCurrencyFormat.format(value)
+
+export const formatNumber = (value) => numberFormat.format(value)

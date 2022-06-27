@@ -5,9 +5,12 @@
                 <div class="q-mb-sm">
                     <q-banner rounded inline-actions class="full-width text-white bg-primary">
                         Orçamentos
+                        <template v-slot:avatar>
+                            <q-icon name="receipt_long" />
+                        </template>
                         <template v-slot:action>
                             <q-input color="secondary" dense v-model="filter" placeholder="Procurar" dark class="q-ml-sm" @keydown.enter="onQueryData">
-                                <q-tooltip :delay="1000"> Procurar por Empresa começando com ... </q-tooltip>
+                                <q-tooltip :delay="1000"> Procurar por Cliente começando com ... </q-tooltip>
                                 <template v-slot:append>
                                     <q-icon name="search" @click="onQueryData" />
                                 </template>
@@ -31,7 +34,7 @@
                                     <q-item-label>
                                         <span class="text-weight-bold">Cliente {{ invoice.customer }}</span>
                                     </q-item-label>
-                                    <q-item-label caption> Valor Total: R$ {{ totalValue(invoice) }}</q-item-label>
+                                    <q-item-label caption> Valor Total: {{ formatCurrency(totalValue(invoice)) }}</q-item-label>
                                 </q-item-section>
                             </q-item>
                         </UseMouseInElement>
@@ -52,7 +55,7 @@
                         </q-card-section>
 
                         <q-card-actions align="right" class="q-pa-sm">
-                            <InvoiceAction :invoice-id="invoice.id" :user-id="user.uid" :userInfoName="userInfoName" />
+                            <DocumentAction :doc-id="invoice.id" :user-id="user.uid" :userInfoName="userInfoName" />
                         </q-card-actions>
                     </q-card>
                 </div>
@@ -78,7 +81,9 @@ import { useRouter } from "vue-router"
 import { getFirestore, collection, query, where, orderBy, limit, onSnapshot, doc, getDoc } from "firebase/firestore"
 import { getAuth } from "firebase/auth"
 
-import InvoiceAction from "components/InvoiceAction.vue"
+import { formatCurrency } from "assets/customFormatters"
+
+import DocumentAction from "components/DocumentAction.vue"
 
 const $q = useQuasar()
 

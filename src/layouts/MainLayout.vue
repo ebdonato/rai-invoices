@@ -15,19 +15,23 @@
                     <q-tooltip :delay="1000"> Início </q-tooltip>
                 </q-btn>
 
-                <q-toolbar-title> Orçamentos do Rainério </q-toolbar-title>
+                <q-toolbar-title> Recibos e Orçamentos do Rainério </q-toolbar-title>
 
                 <div class="q-gutter-sm">
                     <q-btn flat dense round :icon="themeIcon" aria-label="Tema" @click="toggleTheme">
                         <q-tooltip :delay="1000">{{ themeLabel }} </q-tooltip>
                     </q-btn>
 
-                    <q-btn flat dense round icon="store" aria-label="Empresas" :to="{ name: 'CustomersPage' }">
-                        <q-tooltip :delay="1000"> Empresas </q-tooltip>
+                    <q-btn flat dense round icon="store" aria-label="Clientes" :to="{ name: 'CustomersPage' }">
+                        <q-tooltip :delay="1000"> Clientes </q-tooltip>
                     </q-btn>
 
-                    <q-btn flat dense round icon="receipt" aria-label="Orçamentos" :to="{ name: 'InvoicesPage' }">
+                    <q-btn flat dense round icon="receipt_long" aria-label="Orçamentos" :to="{ name: 'InvoicesPage' }">
                         <q-tooltip :delay="1000"> Orçamentos </q-tooltip>
+                    </q-btn>
+
+                    <q-btn flat dense round icon="receipt" aria-label="Recibos" :to="{ name: 'ReceiptsPage' }">
+                        <q-tooltip :delay="1000"> Recibos </q-tooltip>
                     </q-btn>
 
                     <q-btn flat dense round icon="logout" aria-label="Sair" @click="logout">

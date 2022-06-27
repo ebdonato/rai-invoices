@@ -6,8 +6,12 @@
                 <div class="col-grow">Clientes</div>
             </q-btn>
             <q-btn unelevated color="primary" :to="{ name: 'InvoicesPage' }" class="button">
-                <q-icon left size="3em" name="receipt" />
+                <q-icon left size="3em" name="receipt_long" />
                 <div class="col-grow">Orçamentos</div>
+            </q-btn>
+            <q-btn unelevated color="primary" :to="{ name: 'ReceiptsPage' }" class="button">
+                <q-icon left size="3em" name="receipt" />
+                <div class="col-grow">Recibos</div>
             </q-btn>
             <q-btn unelevated color="primary" :to="{ name: 'InfoPage' }" class="button">
                 <q-icon left size="3em" name="alternate_email" />

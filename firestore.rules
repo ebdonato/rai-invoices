@@ -7,6 +7,9 @@ service cloud.firestore {
     match /users/{userId}/invoices/{document=**} {
       allow read: if true;
     }
+    match /users/{userId}/receipts/{document=**} {
+      allow read: if true;
+    }
     match /users/{userId}/{document=**} {
       allow write, read: if request.auth != null && request.auth.uid == userId;
     }

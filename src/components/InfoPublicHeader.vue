@@ -43,7 +43,7 @@ const props = defineProps({
     },
 })
 
-const emit = defineEmits(["error"])
+const emit = defineEmits(["error", "username"])
 
 const isLoading = ref(true)
 
@@ -62,6 +62,8 @@ const getInfo = async () => {
         if (!info.name) {
             throw new Error("Informações não encontradas")
         }
+
+        emit("username", info.fantasyName || info.name)
     } else {
         // doc.data() will be undefined in this case
         throw new Error("Informações não existem")

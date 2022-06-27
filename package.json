@@ -1,8 +1,8 @@
 {
     "name": "rai-invoices",
     "version": "0.11.7",
-    "description": "Sistema para Gestão dos Orçamentos do Rainério",
-    "productName": "Orçamentos do Rainério",
+    "description": "Sistema para Gestão dos Recibos e Orçamentos do Rainério",
+    "productName": "Recibos e Orçamentos do Rainério",
     "author": "Eduardo Donato <eduardo.donato@gmail.com>",
     "private": true,
     "scripts": {
@@ -19,6 +19,7 @@
         "@vueuse/core": "^8.6.0",
         "cpf-cnpj-validator": "^1.0.3",
         "firebase": "^9.8.1",
+        "n2words": "^1.11.1",
         "nanoid": "^3.3.4",
         "quasar": "^2.6.0",
         "vue": "^3.0.0",

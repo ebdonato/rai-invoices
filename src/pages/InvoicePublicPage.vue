@@ -29,20 +29,20 @@
                             <th class="text-center">#</th>
                             <th class="table-main-column text-left">Descrição</th>
                             <th class="text-right">Quantidade</th>
-                            <th class="text-right">Valor (R$)</th>
-                            <th class="text-right">Valor Total (R$)</th>
+                            <th class="text-right">Valor</th>
+                            <th class="text-right">Valor Total</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-for="(item, index) of invoice.items" :key="index">
                             <td class="text-center">{{ index + 1 }}</td>
                             <td class="table-main-column text-left">{{ item.description }}</td>
-                            <td class="text-right">{{ item.quantity }}</td>
-                            <td class="text-right">{{ item.value }}</td>
-                            <td class="text-right">{{ (+item.quantity * +item.value).toFixed(2) }}</td>
+                            <td class="text-right">{{ formatNumber(item.quantity) }}</td>
+                            <td class="text-right">{{ formatCurrency(item.value) }}</td>
+                            <td class="text-right">{{ formatCurrency(+item.quantity * +item.value) }}</td>
                         </tr>
                         <tr>
-                            <td colspan="5" class="text-right">{{ totalValue() }}</td>
+                            <td v-if="invoice.items.length > 1" colspan="5" class="text-right">{{ totalValue() }}</td>
                         </tr>
                     </tbody>
                 </q-markup-table>
@@ -61,7 +61,7 @@
 <script setup>
 import { reactive, ref } from "vue"
 import { getFirestore, doc, getDoc } from "firebase/firestore"
-import { formatCPForCNPJ } from "assets/customFormatters"
+import { formatCPForCNPJ, formatCurrency, formatNumber } from "assets/customFormatters"
 import { useQuasar, date } from "quasar"
 
 import InfoPublicHeader from "components/InfoPublicHeader.vue"
@@ -80,10 +80,6 @@ const props = defineProps({
 })
 
 const errorMessage = ref("")
-
-const errorHandler = (message) => {
-    errorMessage.value = message
-}
 
 const db = getFirestore($q.firebaseApp)
 
@@ -107,7 +103,7 @@ const getInvoice = async () => {
 }
 
 const totalValue = () => {
-    return invoice.items?.reduce((acc, item) => acc + item.quantity * item.value, 0).toFixed(2) ?? 0
+    return formatCurrency(invoice.items?.reduce((acc, item) => acc + item.quantity * item.value, 0).toFixed(2) ?? 0)
 }
 
 const defaultDueDate = () => {
@@ -153,6 +149,6 @@ loadData()
 }
 
 .invoice {
-    min-height: 50vh;
+    min-height: 45vh;
 }
 </style>

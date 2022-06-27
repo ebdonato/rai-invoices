@@ -4,13 +4,13 @@
             <q-scroll-area style="height: 100%; width: 100%">
                 <div class="q-mb-sm">
                     <q-banner rounded inline-actions class="full-width text-white bg-primary">
-                        Clientes
+                        Recibos
                         <template v-slot:avatar>
-                            <q-icon name="store" />
+                            <q-icon name="receipt" />
                         </template>
                         <template v-slot:action>
                             <q-input color="secondary" dense v-model="filter" placeholder="Procurar" dark class="q-ml-sm" @keydown.enter="onQueryData">
-                                <q-tooltip :delay="1000"> Procurar por Nome começando com ... </q-tooltip>
+                                <q-tooltip :delay="1000"> Procurar por Cliente começando com ... </q-tooltip>
                                 <template v-slot:append>
                                     <q-icon name="search" @click="onQueryData" />
                                 </template>
@@ -22,19 +22,19 @@
                     </q-banner>
                 </div>
                 <div class="row justify-between">
-                    <q-card v-for="customer in customers" :key="customer.id" class="col-12 col-sm-5 q-mb-sm">
+                    <q-card v-for="receipt in receipts" :key="receipt.id" class="col-12 col-sm-5 q-mb-sm">
                         <UseMouseInElement v-slot="{ isOutside }">
-                            <q-item clickable @click="onEdit(customer.id)">
+                            <q-item clickable @click="onEdit(receipt.id)">
                                 <q-tooltip :delay="1000"> Clique para editar ou excluir </q-tooltip>
                                 <q-item-section avatar>
-                                    <q-icon size="xl" :name="!isOutside ? 'edit' : customer.person == 'legal' ? 'business' : 'account_circle'" color="primary" />
+                                    <q-icon size="xl" :name="!isOutside ? 'edit' : 'price_check'" color="primary" />
                                 </q-item-section>
 
                                 <q-item-section>
                                     <q-item-label>
-                                        <span class="text-weight-bold">{{ customer.name }}</span>
+                                        <span class="text-weight-bold">{{ receipt.customerName }}</span>
                                     </q-item-label>
-                                    <q-item-label caption> Pessoa {{ customer.person == "legal" ? "Jurídica" : "Física" }} </q-item-label>
+                                    <q-item-label caption> Valor: {{ formatCurrency(receipt.value) }}</q-item-label>
                                 </q-item-section>
                             </q-item>
                         </UseMouseInElement>
@@ -42,17 +42,18 @@
                         <q-card-section class="q-pa-sm">
                             <div class="row">
                                 <div class="column q-mr-md">
-                                    <div class="col text-weight-bold">{{ customer.person == "legal" ? "CNPJ " : "CPF " }}</div>
-                                    <div class="text-weight-bold">Contato</div>
-                                    <div class="text-weight-bold">Telefone</div>
+                                    <div class="col text-weight-bold">Data</div>
+                                    <div class="col text-weight-bold">Local</div>
                                 </div>
                                 <div class="column">
-                                    <div class="col">{{ formatCPForCNPJ(customer.nationalRegistration) }}</div>
-                                    <div>{{ customer.contact }}</div>
-                                    <div>{{ customer.phone }}</div>
+                                    <div class="col">{{ receipt.date }}</div>
+                                    <div class="col">{{ formatLocal(receipt.city, receipt.state) }}</div>
                                 </div>
                             </div>
                         </q-card-section>
+                        <q-card-actions align="right" class="q-pa-sm">
+                            <DocumentAction :doc-id="receipt.id" :user-id="user.uid" :userInfoName="userInfoName" doc-type="receipt" />
+                        </q-card-actions>
                     </q-card>
                 </div>
 
@@ -73,47 +74,81 @@ import { ref, onMounted, onUnmounted } from "vue"
 import { useQuasar } from "quasar"
 import { UseMouseInElement } from "@vueuse/components"
 
-import { getFirestore, collection, query, where, orderBy, limit, onSnapshot } from "firebase/firestore"
+import { getFirestore, collection, query, where, orderBy, limit, onSnapshot, doc, getDoc } from "firebase/firestore"
 import { getAuth } from "firebase/auth"
 
-import { formatCPForCNPJ, formatPhone } from "assets/customFormatters"
+import DocumentAction from "components/DocumentAction.vue"
+import ReceiptDialog from "components/ReceiptDialog.vue"
 
-import CustomerDialog from "components/CustomerDialog.vue"
+import { formatLocal, formatCurrency } from "assets/customFormatters"
 
 const $q = useQuasar()
 
 const db = getFirestore($q.firebaseApp)
 
-const customers = ref([])
+const receipts = ref([])
 const filter = ref("")
 let unsubscribe = null
 
 const user = getAuth().currentUser
-const collectionRef = collection(db, `users/${user.uid}/customers`)
+const collectionRef = collection(db, `users/${user.uid}/receipts`)
+const userInfoRef = doc(db, "users", user.uid)
+
+const userInfoName = ref("")
+
+const onLoad = () => {
+    getDoc(userInfoRef)
+        .then((docSnap) => {
+            if (docSnap.exists()) {
+                const { name = "", fantasyName = "" } = docSnap.data()
+                userInfoName.value = fantasyName || name
+
+                if (!userInfoName.value) {
+                    throw new Error("Informações não encontradas")
+                }
+            } else {
+                // doc.data() will be undefined in this case
+                $q.notify({
+                    type: "warning",
+                    message: "Informações não existem",
+                })
+            }
+        })
+        .catch((error) => {
+            console.error(error)
+
+            $q.notify({
+                type: "negative",
+                message: "Erro ao obter dados",
+                caption: error.message,
+            })
+        })
+}
 
 const onQueryData = () => {
     $q.loading.show()
 
     unsubscribe?.()
 
-    const q = query(collectionRef, orderBy("name"), limit(20), where("name", ">=", filter.value), where("name", "<=", filter.value + "~"))
+    const q = query(collectionRef, orderBy("customer.name"), limit(20), where("customer.name", ">=", filter.value), where("customer.name", "<=", filter.value + "~"))
 
     const querySnapshot = (querySnapshot) => {
         const firestoreData = []
         querySnapshot.forEach((doc) => {
-            const { name, contact, phone, person, nationalRegistration } = doc.data()
+            const { customerName, date, details, value, city, state } = doc.data()
 
             firestoreData.push({
                 id: doc.id,
-                person,
-                name,
-                nationalRegistration: formatCPForCNPJ(nationalRegistration),
-                contact,
-                phone: formatPhone(phone),
+                customerName,
+                date,
+                details,
+                value,
+                city,
+                state,
             })
         })
 
-        customers.value = [...firestoreData]
+        receipts.value = [...firestoreData]
 
         $q.loading.hide()
     }
@@ -128,7 +163,7 @@ const onCancelFilter = () => {
 
 const onEdit = (id) => {
     $q.dialog({
-        component: CustomerDialog,
+        component: ReceiptDialog,
         componentProps: {
             id,
         },
@@ -137,16 +172,18 @@ const onEdit = (id) => {
 
 const onNew = () => {
     $q.dialog({
-        component: CustomerDialog,
+        component: ReceiptDialog,
     })
 }
 
 onMounted(() => {
-    const customerFilterString = $q.localStorage.getItem("customerFilterString")
+    const receiptFilterString = $q.localStorage.getItem("receiptFilterString")
 
-    filter.value = customerFilterString?.filter ?? ""
+    filter.value = receiptFilterString?.filter ?? ""
 
     onQueryData()
+
+    onLoad()
 })
 
 onUnmounted(() => {

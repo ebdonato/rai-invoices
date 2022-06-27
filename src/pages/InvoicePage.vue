@@ -74,7 +74,7 @@
                     </q-btn>
                     <div class="flex flex-center text-h6 q-mx-md">Itens</div>
                     <q-space />
-                    <div class="flex flex-center q-mx-md">Valor Total: R$ {{ totalValue() }}</div>
+                    <div class="flex flex-center q-mx-md">Valor Total: {{ totalValue() }}</div>
                 </q-card-section>
 
                 <div v-if="!invoice.items.length" class="text-center q-mt-sm">Nenhum item adicionado.</div>
@@ -153,13 +153,10 @@
 import { ref, reactive, onMounted } from "vue"
 import { useQuasar, date } from "quasar"
 import { onBeforeRouteLeave, useRouter } from "vue-router"
-
 import { getFirestore, collection, query, where, orderBy, limit, doc, getDoc, getDocs, setDoc, deleteDoc } from "firebase/firestore"
 import { getAuth } from "firebase/auth"
-
 import { nanoid } from "nanoid"
-
-import { formatCPForCNPJ, formatPhone } from "assets/customFormatters"
+import { formatCPForCNPJ, formatCurrency } from "assets/customFormatters"
 
 const $q = useQuasar()
 
@@ -194,7 +191,7 @@ const customerCollectionRef = collection(db, `users/${user.uid}/customers`)
 const invoicePath = `users/${user.uid}/invoices`
 
 const totalValue = () => {
-    return invoice.items.reduce((acc, item) => acc + item.quantity * item.value, 0).toFixed(2)
+    return formatCurrency(invoice.items.reduce((acc, item) => acc + item.quantity * item.value, 0))
 }
 
 const queryCustomers = async (filter = "") => {
@@ -301,7 +298,7 @@ const onSubmit = () => {
 
             $q.notify({
                 type: "negative",
-                message: "Erro ao obter dados",
+                message: "Erro ao enviar dados",
                 caption: error.message,
             })
         })
