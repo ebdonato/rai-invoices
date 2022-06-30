@@ -29,3 +29,8 @@
     width: 100%;
     max-width: 800px;
 }
+
+.public-view {
+    min-height: 35vh;
+    min-height: var(--vh, 35vh);
+}

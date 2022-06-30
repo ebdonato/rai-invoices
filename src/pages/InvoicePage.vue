@@ -17,7 +17,7 @@
                         emit-value
                         map-options
                         lazy-rules
-                        :rules="[(val) => !!val || 'Campo obrigatório.']"
+                        :rules="[(val) => !!val || 'Campo obrigatório']"
                         use-input
                         @filter="onFilterCustomer"
                         @update:model-value="touched = true"
@@ -37,7 +37,7 @@
                         label="Data"
                         class="items"
                         lazy-rules
-                        :rules="[(val) => !!val || 'Campo obrigatório.']"
+                        :rules="[(val) => !!val || 'Campo obrigatório']"
                         @update:model-value="touched = true"
                     >
                         <template v-slot:append>
@@ -93,7 +93,7 @@
                             label="Descrição"
                             class="items"
                             lazy-rules
-                            :rules="[(val) => !!val || 'Campo obrigatório.']"
+                            :rules="[(val) => !!val || 'Campo obrigatório']"
                             @update:model-value="touched = true"
                         />
                         <q-input
@@ -106,7 +106,7 @@
                             reverse-fill-mask
                             input-class="text-right"
                             lazy-rules
-                            :rules="[(val) => (!isNaN(val) && val > 0) || 'Valor inválido.']"
+                            :rules="[(val) => (!isNaN(val) && val > 0) || 'Valor inválido']"
                             @update:model-value="touched = true"
                         />
                         <q-input
@@ -120,7 +120,7 @@
                             input-class="text-right"
                             prefix="R$"
                             lazy-rules
-                            :rules="[(val) => (!isNaN(val) && val > 0) || 'Valor inválido.']"
+                            :rules="[(val) => (!isNaN(val) && val > 0) || 'Valor inválido']"
                             @update:model-value="touched = true"
                         />
                         <q-field outlined label="Valor Total" stack-label class="monetary-items" prefix="R$">

@@ -18,7 +18,7 @@
                         input-class="text-right"
                         prefix="R$"
                         lazy-rules
-                        :rules="[(val) => (!isNaN(val) && val > 0) || 'Valor inválido.']"
+                        :rules="[(val) => (!isNaN(val) && val > 0) || 'Valor inválido']"
                         @update:model-value="touched = true"
                     />
                     <q-select
@@ -30,7 +30,7 @@
                         emit-value
                         map-options
                         lazy-rules
-                        :rules="[(val) => !!val || 'Campo obrigatório.']"
+                        :rules="[(val) => !!val || 'Campo obrigatório']"
                         use-input
                         @filter="onFilterCustomer"
                         @update:model-value="touched = true"
@@ -50,7 +50,7 @@
                         label="Data"
                         class="items"
                         lazy-rules
-                        :rules="[(val) => !!val || 'Campo obrigatório.']"
+                        :rules="[(val) => !!val || 'Campo obrigatório']"
                         @update:model-value="touched = true"
                     >
                         <template v-slot:append>

@@ -7,7 +7,7 @@
             </div>
             <div class="column content-center">Orçamento: {{ invoiceId }}</div>
         </div>
-        <div v-else class="column content-center q-pa-xs q-gutter-xs invoice">
+        <div v-else class="column content-center q-pa-xs q-gutter-xs public-view">
             <InfoPublicHeader :userId="userId" @error="(message) => (errorMessage = message)" />
             <q-card flat bordered :dark="false" class="print-card">
                 <q-card-section class="q-pa-xs">
@@ -146,9 +146,5 @@ loadData()
 
 .table-main-column {
     width: 70%;
-}
-
-.invoice {
-    min-height: 45vh;
 }
 </style>

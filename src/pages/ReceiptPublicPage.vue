@@ -7,7 +7,7 @@
             </div>
             <div class="column content-center">Orçamento: {{ receiptId }}</div>
         </div>
-        <div v-else class="column content-center q-pa-xs q-gutter-xs receipt">
+        <div v-else class="column content-center q-pa-xs q-gutter-xs public-view">
             <InfoPublicHeader :userId="userId" @error="(message) => (errorMessage = message)" @username="(name) => (username = name)" />
             <q-card flat bordered :dark="false" class="print-card q-py-xs q-px-md" :style="{ 'flex-grow': '1' }">
                 <div class="text-center text-h3">Recibo</div>
@@ -126,10 +126,6 @@ loadData()
 
 .table-main-column {
     width: 70%;
-}
-
-.receipt {
-    min-height: 45vh;
 }
 
 .sign-placeholder {
