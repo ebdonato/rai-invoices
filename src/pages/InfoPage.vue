@@ -89,10 +89,8 @@
 import { reactive, ref, onMounted } from "vue"
 import { useQuasar } from "quasar"
 import { onBeforeRouteLeave, useRouter } from "vue-router"
-
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore"
 import { getAuth } from "firebase/auth"
-
 import { cpf, cnpj } from "cpf-cnpj-validator"
 
 const $q = useQuasar()
@@ -117,6 +115,7 @@ const info = reactive({
     email: "",
 })
 const touched = ref(false)
+
 const loadingCEP = ref(false)
 
 const personOptions = [
@@ -223,7 +222,7 @@ const onLoad = () => {
 
             $q.notify({
                 type: "negative",
-                message: "Erro ao obter dados",
+                message: "Erro ao obter informações",
                 caption: error.message,
             })
         })
@@ -251,7 +250,7 @@ const onSubmit = () => {
 
             $q.notify({
                 type: "negative",
-                message: "Erro ao obter dados",
+                message: "Erro ao atualizar informações",
                 caption: error.message,
             })
         })
