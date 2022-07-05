@@ -4,24 +4,31 @@
             <q-circular-progress indeterminate size="50px" :thickness="0.22" color="grey-6" track-color="grey-3" class="q-ma-md" />
         </div>
         <q-card-section v-else class="q-pa-xs">
-            <div class="row q-gutter-sm">
-                <div class="col-grow text-h5">{{ info.fantasyName || info.name }}</div>
-                <div class="self-end" v-if="info.fantasyName">{{ info.name }}</div>
-                <div class="self-end" v-if="info.nationalRegistration">{{ info.person == "legal" ? "CNPJ" : "CPF" }}: {{ formatCPForCNPJ(info.nationalRegistration) }}</div>
-            </div>
-            <div class="row q-gutter-sm">
-                <div class="row col" v-if="info.addressLine1 || info.addressLine2 || info.city || info.state">
-                    <div class="q-mr-sm">
-                        <q-icon name="business" />
-                    </div>
-                    <div>
-                        <div>{{ info.addressLine1 }}<span v-if="info.addressLine1 && info.addressLine2"> - </span>{{ info.addressLine2 }}</div>
-                        <div>{{ info.city }}<span v-if="info.city && info.state"> - </span>{{ info.state }}</div>
-                    </div>
+            <div class="row">
+                <div v-if="info.logoUrl" class="column col-1 q-mx-xs justify-center">
+                    <q-img :src="info.logoUrl" :ratio="1" class="rounded-borders"></q-img>
                 </div>
-                <div class="col">
-                    <div class="text-right" v-if="info.phone"><q-icon name="perm_phone_msg" class="q-mr-sm" /> {{ formatPhone(info.phone) }}</div>
-                    <div class="text-right" v-if="info.email"><q-icon name="mail" class="q-mr-sm" /> {{ info.email }}</div>
+                <div class="col-grow q-mx-xs">
+                    <div class="row q-gutter-sm">
+                        <div class="col-grow text-h5">{{ info.fantasyName || info.name }}</div>
+                        <div class="self-end" v-if="info.fantasyName">{{ info.name }}</div>
+                        <div class="self-end" v-if="info.nationalRegistration">{{ info.person == "legal" ? "CNPJ" : "CPF" }}: {{ formatCPForCNPJ(info.nationalRegistration) }}</div>
+                    </div>
+                    <div class="row q-gutter-sm">
+                        <div class="row col" v-if="info.addressLine1 || info.addressLine2 || info.city || info.state">
+                            <div class="q-mr-sm">
+                                <q-icon name="business" />
+                            </div>
+                            <div>
+                                <div>{{ info.addressLine1 }}<span v-if="info.addressLine1 && info.addressLine2"> - </span>{{ info.addressLine2 }}</div>
+                                <div>{{ info.city }}<span v-if="info.city && info.state"> - </span>{{ info.state }}</div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="text-right" v-if="info.phone"><q-icon name="perm_phone_msg" class="q-mr-sm" /> {{ formatPhone(info.phone) }}</div>
+                            <div class="text-right" v-if="info.email"><q-icon name="mail" class="q-mr-sm" /> {{ info.email }}</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </q-card-section>
@@ -58,6 +65,8 @@ const getInfo = async () => {
 
     if (docSnap.exists()) {
         Object.assign(info, docSnap.data())
+
+        info.logoUrl ||= "logo.svg"
 
         if (!info.name) {
             throw new Error("Informações não encontradas")
