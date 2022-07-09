@@ -49,9 +49,11 @@
             </q-card>
             <q-card flat bordered :dark="false" class="print-card">
                 <q-card-section class="row q-pa-xs align-start">
-                    <div class="text-weight-medium q-mr-xs">Observações:</div>
-                    <div v-if="!!invoice.note" v-html="$sanitize(invoice.note)" />
-                    <div v-else>Sem Observações</div>
+                    <div v-if="!!invoice.note">
+                        <div class="text-weight-medium q-mr-xs">Observações:</div>
+                        <div v-html="$sanitize(invoice.note)" />
+                    </div>
+                    <div v-else class="text-weight-regular q-mr-xs">Sem Observações</div>
                 </q-card-section>
             </q-card>
         </div>
