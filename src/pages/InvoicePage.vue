@@ -281,6 +281,7 @@ const onSubmit = () => {
     const docRef = doc(db, invoicePath, props.id ?? nanoid())
 
     invoice.customerName = invoice.customer.name
+    invoice.note = /^(<br>)|(<div><br><\/div>)+$/.test(invoice.note.trim()) ? "" : invoice.note.trim()
 
     setDoc(docRef, invoice)
         .then(() => {
