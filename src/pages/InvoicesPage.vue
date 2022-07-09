@@ -55,7 +55,7 @@
                         </q-card-section>
 
                         <q-card-actions align="right" class="q-pa-sm">
-                            <DocumentAction :doc-id="invoice.id" :user-id="user.uid" :userInfoName="userInfoName" />
+                            <DocumentAction :doc-id="invoice.id" :user-id="user.uid" :userInfoName="userInfoName" @edit="onEdit(invoice.id)" />
                         </q-card-actions>
                     </q-card>
                 </div>

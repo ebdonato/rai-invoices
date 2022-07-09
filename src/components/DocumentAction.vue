@@ -1,5 +1,9 @@
 <template>
     <div class="q-gutter-sm">
+        <q-btn flat dense round color="primary" icon="edit" aria-label="Editar" @click="$emit('edit')">
+            <q-tooltip :delay="1000"> Editar </q-tooltip>
+        </q-btn>
+
         <q-btn flat dense round color="primary" icon="fa-solid fa-arrow-up-right-from-square" aria-label="Abrir" @click="openLink">
             <q-tooltip :delay="1000"> Abrir </q-tooltip>
         </q-btn>
@@ -22,6 +26,8 @@ import { copyToClipboard, openURL, useQuasar } from "quasar"
 const { share, isSupported } = useShare()
 
 const $q = useQuasar()
+
+defineEmits(["edit"])
 
 function startShare() {
     const title = `${docName.value} ${props.userInfoName ? "de" : ""} ${props.userInfoName}`

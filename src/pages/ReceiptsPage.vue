@@ -52,7 +52,7 @@
                             </div>
                         </q-card-section>
                         <q-card-actions align="right" class="q-pa-sm">
-                            <DocumentAction :doc-id="receipt.id" :user-id="user.uid" :userInfoName="userInfoName" doc-type="receipt" />
+                            <DocumentAction :doc-id="receipt.id" :user-id="user.uid" :userInfoName="userInfoName" doc-type="receipt" @edit="onEdit(receipt.id)" />
                         </q-card-actions>
                     </q-card>
                 </div>
