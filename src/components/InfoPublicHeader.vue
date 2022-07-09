@@ -5,8 +5,8 @@
         </div>
         <q-card-section v-else class="q-pa-xs">
             <div class="row">
-                <div v-if="info.logoUrl" class="column col-1 q-mx-xs justify-center">
-                    <q-img :src="info.logoUrl" :ratio="1" class="rounded-borders"></q-img>
+                <div v-if="info.logoUrl" class="column col-grow q-mx-xs justify-center" style="min-width: 70px">
+                    <q-img :src="info.logoUrl" height="70px" class="rounded-borders"></q-img>
                 </div>
                 <div class="col-grow q-mx-xs">
                     <div class="row q-gutter-sm">
