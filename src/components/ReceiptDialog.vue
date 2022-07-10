@@ -117,7 +117,7 @@ import { useDialogPluginComponent, useQuasar, date } from "quasar"
 import { getFirestore, collection, query, where, orderBy, limit, doc, getDoc, getDocs, setDoc, deleteDoc } from "firebase/firestore"
 import { getAuth } from "firebase/auth"
 import { ref, onMounted, reactive } from "vue"
-import { nanoid } from "nanoid"
+import uuidAPIKey from "uuid-apikey"
 import { formatCPForCNPJ } from "assets/customFormatters"
 
 defineEmits([...useDialogPluginComponent.emits])
@@ -228,7 +228,7 @@ const getReceipt = (id) => {
 const onSubmit = () => {
     $q.loading.show()
 
-    const docRef = doc(db, receiptsPath, props.id ?? nanoid())
+    const docRef = doc(db, receiptsPath, props.id ?? uuidAPIKey.create().apiKey)
 
     receipt.customerName = receipt.customer.name
 

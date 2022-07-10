@@ -47,7 +47,7 @@ import { useDialogPluginComponent, useQuasar } from "quasar"
 import { getFirestore, doc, getDoc, setDoc, deleteDoc } from "firebase/firestore"
 import { getAuth } from "firebase/auth"
 import { ref, onMounted, reactive } from "vue"
-import { nanoid } from "nanoid"
+import uuidAPIKey from "uuid-apikey"
 import { cpf, cnpj } from "cpf-cnpj-validator"
 
 defineEmits([...useDialogPluginComponent.emits])
@@ -119,7 +119,7 @@ const getCustomer = (id) => {
 const onSubmit = () => {
     $q.loading.show()
 
-    const docRef = doc(db, customersPath, props.id ?? nanoid())
+    const docRef = doc(db, customersPath, props.id ?? uuidAPIKey.create().apiKey)
 
     const document = {
         name: customer.name,

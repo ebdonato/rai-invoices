@@ -2,7 +2,7 @@
 
 import { createUploaderComponent } from "quasar"
 import { computed, ref, watch } from "vue"
-import { nanoid } from "nanoid"
+import uuidAPIKey from "uuid-apikey"
 
 // Firebase stuff
 import { getStorage, getDownloadURL, ref as firebaseRef, uploadBytesResumable } from "@firebase/storage"
@@ -83,7 +83,7 @@ export default createUploaderComponent({
                 if (helpers.uploadedFiles.value.includes(fileToUpload)) return
 
                 //? 👇 This can be whatever you want ~ can use UUID to generate unique file names
-                const fileName = `${nanoid()}.${fileToUpload.name?.split(".")?.at(-1) || "jpeg"}`
+                const fileName = `${uuidAPIKey.create().apiKey}.${fileToUpload.name?.split(".")?.at(-1) || "jpeg"}`
                 const storageRef = firebaseRef(storage, `${props.directory}/${fileName}`)
 
                 const uploadTask = uploadBytesResumable(storageRef, fileToUpload)
