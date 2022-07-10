@@ -5,8 +5,8 @@
         </div>
         <q-card-section v-else class="q-pa-xs">
             <div class="row">
-                <div v-if="info.logoUrl" class="column col-grow q-mx-xs justify-center" style="min-width: 70px">
-                    <q-img :src="info.logoUrl" height="70px" class="rounded-borders"></q-img>
+                <div v-if="info.logoUrl" class="column q-mx-xs justify-center" style="min-width: 70px; max-height: 70px" :class="{ 'col-grow': isLogoWider }">
+                    <q-img :src="info.logoUrl" fit="contain" class="rounded-borders" @load="onLoad"></q-img>
                 </div>
                 <div class="col-grow q-mx-xs">
                     <div class="row q-gutter-sm">
@@ -96,4 +96,14 @@ const loadData = async () => {
 }
 
 loadData()
+
+const isLogoWider = ref(true)
+
+const onLoad = (src) => {
+    const img = new Image()
+    img.src = src
+    img.onload = function () {
+        isLogoWider.value = this.width > this.height
+    }
+}
 </script>

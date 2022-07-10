@@ -23,7 +23,7 @@
                     </div>
                 </div>
                 <div v-else class="column button">
-                    <q-img :src="logo || 'logo.png'" :ratio="1" style="max-width: 300px; max-height: 300px" class="rounded-borders">
+                    <q-img :src="logo || 'logo.png'" fit="contain" style="max-width: 300px; max-height: 300px" class="rounded-borders">
                         <div class="absolute-bottom text-center" style="padding: 0">
                             <q-btn icon="file_upload" flat @click="onChangeLogo"> </q-btn>
                             <q-btn v-if="logo" icon="delete" flat @click="onDelete"> </q-btn>
