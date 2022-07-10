@@ -113,6 +113,7 @@ const info = reactive({
     nationalRegistration: "",
     phone: "",
     email: "",
+    logoUrl: "",
 })
 const touched = ref(false)
 
@@ -206,9 +207,10 @@ const onLoad = () => {
                     nationalRegistration = "",
                     phone = "",
                     email = "",
+                    logoUrl = "",
                 } = docSnap.data()
 
-                Object.assign(info, { name, fantasyName, zipCode, addressLine1, addressLine2, city, state, person, nationalRegistration, phone, email })
+                Object.assign(info, { name, fantasyName, zipCode, addressLine1, addressLine2, city, state, person, nationalRegistration, phone, email, logoUrl })
             } else {
                 // doc.data() will be undefined in this case
                 $q.notify({
