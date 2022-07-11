@@ -72,7 +72,7 @@ const getInfo = async () => {
 
         info.logoUrl ||= "logo.svg"
 
-        if (!info.name) {
+        if (!info.name && !info.fantasyName) {
             throw new Error("Informações não encontradas")
         }
 
