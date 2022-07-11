@@ -155,7 +155,7 @@ import { useQuasar, date } from "quasar"
 import { onBeforeRouteLeave, useRouter } from "vue-router"
 import { getFirestore, collection, query, where, orderBy, limit, doc, getDoc, getDocs, setDoc, deleteDoc } from "firebase/firestore"
 import { getAuth } from "firebase/auth"
-import uuidAPIKey from "uuid-apikey"
+import { nanoid } from "nanoid"
 import { formatCPForCNPJ, formatCurrency } from "assets/customFormatters"
 
 const $q = useQuasar()
@@ -278,7 +278,7 @@ const getInvoice = (id) => {
 const onSubmit = () => {
     $q.loading.show()
 
-    const docRef = doc(db, invoicePath, props.id ?? uuidAPIKey.create().apiKey)
+    const docRef = doc(db, invoicePath, props.id ?? Date.now().toString())
 
     invoice.customerName = invoice.customer.name
     invoice.note = /^(<br>)|(<div><br><\/div>)+$/.test(invoice.note.trim()) ? "" : invoice.note.trim()
