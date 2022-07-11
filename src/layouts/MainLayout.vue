@@ -63,7 +63,7 @@ import { ref, computed } from "vue"
 import { useQuasar } from "quasar"
 import { useRouter } from "vue-router"
 import { getAuth, signOut } from "firebase/auth"
-import { updateAddressbarColors } from "boot/init"
+import { updateAddressbarColors } from "assets/utils"
 
 import MadeByDialog from "components/MadeByDialog.vue"
 
