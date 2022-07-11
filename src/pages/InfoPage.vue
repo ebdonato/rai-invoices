@@ -8,14 +8,27 @@
 
                 <q-card-section class="row q-gutter-md justify-center">
                     <q-input
+                        ref="nameInput"
                         outlined
                         v-model="info.name"
                         label="Nome"
-                        :rules="[(val) => !!val || 'Campo Obrigatório']"
+                        :rules="[(val) => !!val || !!info.fantasyName || 'Preencha pelo menos \'Nome\' ou \'Nome Fantasia\'']"
                         @update:model-value="touched = true"
                         class="col-sm-5 col-11"
+                        lazy-rules
+                        @blur="fantasyNameInput.validate()"
                     />
-                    <q-input outlined v-model="info.fantasyName" label="Nome Fantasia" @update:model-value="touched = true" class="col-sm-5 col-11" />
+                    <q-input
+                        ref="fantasyNameInput"
+                        outlined
+                        v-model="info.fantasyName"
+                        label="Nome Fantasia"
+                        @update:model-value="touched = true"
+                        class="col-sm-5 col-11"
+                        :rules="[(val) => !!val || !!info.name || 'Preencha pelo menos \'Nome\' ou \'Nome Fantasia\'']"
+                        lazy-rules
+                        @blur="nameInput.validate()"
+                    />
                     <q-select
                         outlined
                         v-model="info.person"
@@ -74,8 +87,6 @@
                     />
                 </q-card-section>
 
-                <q-separator dark />
-
                 <q-card-actions align="right">
                     <q-btn color="primary" class="default-button" :to="{ name: 'IndexPage' }">Cancelar</q-btn>
                     <q-btn color="primary" class="default-button" :disable="!touched" type="submit">OK</q-btn>
@@ -115,9 +126,14 @@ const info = reactive({
     email: "",
     logoUrl: "",
 })
+
 const touched = ref(false)
 
 const loadingCEP = ref(false)
+
+const nameInput = ref(null)
+
+const fantasyNameInput = ref(null)
 
 const personOptions = [
     {
@@ -209,6 +225,10 @@ const onLoad = () => {
                     email = "",
                     logoUrl = "",
                 } = docSnap.data()
+
+                if (!name && !fantasyName) {
+                    throw new Error("Informações não encontradas")
+                }
 
                 Object.assign(info, { name, fantasyName, zipCode, addressLine1, addressLine2, city, state, person, nationalRegistration, phone, email, logoUrl })
             } else {

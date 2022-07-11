@@ -39,21 +39,9 @@
             </div>
 
             <div class="column justify-center items-start q-gutter-sm">
-                <q-btn unelevated color="primary" :to="{ name: 'CustomersPage' }" class="button">
-                    <q-icon left size="3em" name="store" />
-                    <div class="col-grow">Clientes</div>
-                </q-btn>
-                <q-btn unelevated color="primary" :to="{ name: 'InvoicesPage' }" class="button">
-                    <q-icon left size="3em" name="receipt_long" />
-                    <div class="col-grow">Orçamentos</div>
-                </q-btn>
-                <q-btn unelevated color="primary" :to="{ name: 'ReceiptsPage' }" class="button">
-                    <q-icon left size="3em" name="receipt" />
-                    <div class="col-grow">Recibos</div>
-                </q-btn>
-                <q-btn unelevated color="primary" :to="{ name: 'InfoPage' }" class="button">
-                    <q-icon left size="3em" name="alternate_email" />
-                    <div class="col-grow">Info</div>
+                <q-btn v-for="({ name, label, icon }, key) in options" :key="key" unelevated color="primary" :to="{ name }" class="button">
+                    <q-icon left size="3em" :name="icon" />
+                    <div class="col-grow">{{ label }}</div>
                 </q-btn>
             </div>
         </div>
@@ -67,6 +55,34 @@ import { useQuasar } from "quasar"
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore"
 
 import LogoUploader from "components/LogoUploader"
+
+const options = [
+    {
+        name: "CustomersPage",
+        label: "Clientes",
+        icon: "store",
+    },
+    {
+        name: "InvoicesPage",
+        label: "Orçamentos",
+        icon: "receipt_long",
+    },
+    {
+        name: "ReceiptsPage",
+        label: "Recibos",
+        icon: "receipt",
+    },
+    {
+        name: "InfoPage",
+        label: "Informações",
+        icon: "alternate_email",
+    },
+    {
+        name: "UserPage",
+        label: "Usuário",
+        icon: "account_circle",
+    },
+]
 
 const $q = useQuasar()
 

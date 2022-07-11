@@ -65,6 +65,11 @@ const routes = [
                 component: () => import("pages/ReceiptsPage.vue"),
                 name: "ReceiptsPage",
             },
+            {
+                path: "user",
+                component: () => import("pages/UserPage.vue"),
+                name: "UserPage",
+            },
         ],
     },
 
