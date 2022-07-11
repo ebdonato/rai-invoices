@@ -53,20 +53,19 @@ export default boot(({ app, router }) => {
     onAuthStateChanged(firebaseAuth, (user) => {
         const atPublicRoute = publicRoutesName.includes(router.currentRoute.value.name)
 
+        if (atPublicRoute) return
+
         if (user) {
-            // User is signed in, see docs for a list of available properties
-            // https://firebase.google.com/docs/reference/js/firebase.User
             Notify.create({
                 type: "info",
                 message: `Olá ${user.displayName ?? user.email}`,
             })
 
-            !atPublicRoute &&
-                router.push(app.redirectTo ?? "/main").then(() => {
-                    app.redirectTo = null
-                })
+            router.push(app.redirectTo ?? "/main").then(() => {
+                app.redirectTo = null
+            })
         } else {
-            !atPublicRoute && router.push("/")
+            router.push({ name: "LoginPage" })
         }
     })
 })
