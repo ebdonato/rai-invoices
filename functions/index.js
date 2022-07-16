@@ -9,9 +9,6 @@ admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
 })
 
-// Create and Deploy Your First Cloud Functions
-// https://firebase.google.com/docs/functions/write-firebase-functions
-
 const renderInvoice = (data) => {
     const options = {
         reportName: "Invoice {d.invoice.id}.docx",
@@ -64,7 +61,7 @@ exports.invoice = functions.https.onRequest(async (request, response) => {
         const user = await getDocData("users", userId)
 
         if (!user) {
-            response.status(404).send({ message: "User not fount" })
+            response.status(404).send({ message: "User not found" })
             return
         }
 
@@ -73,7 +70,7 @@ exports.invoice = functions.https.onRequest(async (request, response) => {
         const invoice = await getDocData(`users/${userId}/invoices`, invoiceId)
 
         if (!invoice) {
-            response.status(404).send({ message: "Invoice not fount" })
+            response.status(404).send({ message: "Invoice not found" })
             return
         }
 
