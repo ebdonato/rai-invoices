@@ -7,6 +7,7 @@
     "eslint.validate": ["javascript", "javascriptreact", "typescript", "vue"],
     "cSpell.words": [
         "Addressbar",
+        "carbone",
         "CNPJ",
         "Contato",
         "Contatos",
@@ -15,8 +16,11 @@
         "icongenie",
         "Iconpacks",
         "Itapemirim",
+        "officedocument",
+        "openxmlformats",
         "Rainério",
         "Tchau",
-        "vueuse"
+        "vueuse",
+        "wordprocessingml"
     ]
 }
