@@ -1,17 +1,34 @@
 const functions = require("firebase-functions")
+
 const carbone = require("carbone")
 
 const admin = require("firebase-admin")
 
 const serviceAccount = require("./serviceAccountKey.json")
 
+const { formatCPForCNPJ, formatReverseDate } = require("./assets/customFormatters")
+
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
 })
 
+const enhanceInvoice = (invoice) => {
+    if (invoice?.customer?.nationalRegistration) {
+        invoice.customer.nationalRegistration = formatCPForCNPJ(invoice.customer.nationalRegistration)
+    }
+
+    if (invoice?.date) {
+        invoice.reverseDate = formatReverseDate(invoice.date)
+    } else {
+        invoice.reverseDate = "0000.00.00"
+    }
+
+    return invoice
+}
+
 const renderInvoice = (data) => {
     const options = {
-        reportName: "Invoice {d.invoice.id}.docx",
+        reportName: "Invoice_{d.invoice.reverseDate}_{d.invoice.id}.docx",
     }
 
     return new Promise((resolve, reject) => {
@@ -73,6 +90,8 @@ exports.invoice = functions.https.onRequest(async (request, response) => {
             response.status(404).send({ message: "Invoice not found" })
             return
         }
+
+        enhanceInvoice(invoice)
 
         const { reportName, result } = await renderInvoice({ user, invoice })
 
