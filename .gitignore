@@ -31,3 +31,7 @@ yarn-error.log*
 
 # Firebase
 .firebase
+
+# Functions
+serviceAccountKey.json
+*.log
