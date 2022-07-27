@@ -52,8 +52,9 @@ export default boot(({ app, router }) => {
 
     onAuthStateChanged(firebaseAuth, (user) => {
         const atPublicRoute = publicRoutesName.includes(router.currentRoute.value.name)
+        const atNoRoute = !router.currentRoute.value.name
 
-        if (atPublicRoute) return
+        if (atPublicRoute || atNoRoute) return
 
         if (user) {
             Notify.create({
