@@ -1,17 +1,54 @@
 const functions = require("firebase-functions")
+
 const carbone = require("carbone")
 
 const admin = require("firebase-admin")
 
 const serviceAccount = require("./serviceAccountKey.json")
 
+const { formatCPForCNPJ, formatReverseDate, formatPhone, formatCurrency } = require("./assets/customFormatters")
+
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
 })
 
+const enhanceInvoice = (invoice) => {
+    if (invoice?.customer?.nationalRegistration) {
+        invoice.customer.nationalRegistration = formatCPForCNPJ(invoice.customer.nationalRegistration)
+    }
+
+    if (invoice?.date) {
+        invoice.reverseDate = formatReverseDate(invoice.date)
+    } else {
+        invoice.reverseDate = "0000.00.00"
+    }
+
+    if (invoice?.items) {
+        invoice.items = invoice.items.map((item, index) => ({ ...item, index: index + 1, valueTotal: +item.quantity * +item.value }))
+
+        invoice.itemsTotal = formatCurrency(invoice.items.reduce((acc, item) => (acc += +item.valueTotal), 0))
+
+        invoice.items = invoice.items.map((item) => ({ ...item, value: formatCurrency(item.value), valueTotal: formatCurrency(item.valueTotal) }))
+    }
+
+    return invoice
+}
+
+const enhanceUser = (user) => {
+    if (user?.nationalRegistration) {
+        user.nationalRegistration = formatCPForCNPJ(user.nationalRegistration)
+    }
+
+    if (user?.phone) {
+        user.phone = formatPhone(user.phone)
+    }
+
+    return user
+}
+
 const renderInvoice = (data) => {
     const options = {
-        reportName: "Invoice {d.invoice.id}.docx",
+        reportName: "Invoice_{d.invoice.reverseDate}_{d.invoice.id}.docx",
     }
 
     return new Promise((resolve, reject) => {
@@ -62,6 +99,7 @@ exports.invoice = functions.https.onRequest(async (request, response) => {
 
         if (!user) {
             response.status(404).send({ message: "User not found" })
+
             return
         }
 
@@ -71,8 +109,13 @@ exports.invoice = functions.https.onRequest(async (request, response) => {
 
         if (!invoice) {
             response.status(404).send({ message: "Invoice not found" })
+
             return
         }
+
+        enhanceUser(user)
+
+        enhanceInvoice(invoice)
 
         const { reportName, result } = await renderInvoice({ user, invoice })
 

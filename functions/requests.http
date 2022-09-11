@@ -1,7 +1,3 @@
-GET http://localhost:5001/rainerio-invoices/us-central1/helloWorld
-
-###
-
 @userId = 239R8TuP97fpqgTacVSbZikJhCF2
-@invoideId = 1657520158717
+@invoideId = za4KlybCOHleoebzfOG3_
 GET http://localhost:5001/rainerio-invoices/us-central1/invoice?userId={{userId}}&invoiceId={{invoideId}}
