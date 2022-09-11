@@ -106,7 +106,7 @@ const viewUrl = computed(() => {
 })
 
 const downloadUrl = computed(() => {
-    return `${process.env.FUNCTIONS_BASE_URL}/${props.docType}?userId=${props.userId}&invoiceId=${props.docId}`
+    return `${process.env.FUNCTIONS_BASE_URL}/${props.docType}?userId=${props.userId}&docId=${props.docId}`
 })
 </script>
 

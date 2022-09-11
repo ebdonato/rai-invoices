@@ -88,7 +88,7 @@ const getDocData = async (collectionPath, docId) => {
 exports.invoice = functions.https.onRequest(async (request, response) => {
     functions.logger.info("Render invoice", { structuredData: true })
 
-    const { userId, invoiceId } = request.query
+    const { userId, docId: invoiceId } = request.query
 
     functions.logger.info({ userId, invoiceId }, { structuredData: true })
 
