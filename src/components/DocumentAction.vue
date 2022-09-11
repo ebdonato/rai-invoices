@@ -12,6 +12,10 @@
             <q-tooltip :delay="1000"> Copiar link </q-tooltip>
         </q-btn>
 
+        <q-btn v-if="props.docType == 'invoice'" flat dense round color="primary" icon="fa-solid fa-file-word" aria-label="Download" type="a" :href="downloadUrl" target="_blank">
+            <q-tooltip :delay="1000"> Download (docx) </q-tooltip>
+        </q-btn>
+
         <q-btn v-if="isSupported" flat dense round color="primary" icon="fa-solid fa-share-nodes" aria-label="Compartilhar" @click="startShare">
             <q-tooltip :delay="1000"> Compartilhar </q-tooltip>
         </q-btn>
@@ -35,16 +39,16 @@ function startShare() {
     share({
         title,
         text: `${docName.value} ID: ${props.docId}`,
-        url: url.value,
+        url: viewUrl.value,
     })
 }
 
 function openLink() {
-    openURL(url.value)
+    openURL(viewUrl.value)
 }
 
 function copyLink() {
-    copyToClipboard(url.value)
+    copyToClipboard(viewUrl.value)
         .then(() => {
             $q.notify({
                 type: "positive",
@@ -92,13 +96,17 @@ const docName = computed(() => {
     return docTypeTranslateToName[props.docType] ?? "Orçamento"
 })
 
-const url = computed(() => {
+const viewUrl = computed(() => {
     const docTypeTranslateToUrlPart = {
         invoice: "i",
         receipt: "r",
     }
 
     return `${location.protocol}//${location.host}/#/pub/u/${props.userId}/${docTypeTranslateToUrlPart[props.docType] ?? "i"}/${props.docId}`
+})
+
+const downloadUrl = computed(() => {
+    return `${process.env.FUNCTIONS_BASE_URL}/${props.docType}?userId=${props.userId}&docId=${props.docId}`
 })
 </script>
 

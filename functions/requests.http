@@ -1,0 +1,3 @@
+@userId = 239R8TuP97fpqgTacVSbZikJhCF2
+@invoideId = za4KlybCOHleoebzfOG3_
+GET http://localhost:5001/rainerio-invoices/us-central1/invoice?userId={{userId}}&docId={{invoideId}}
