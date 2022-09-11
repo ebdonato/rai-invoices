@@ -8,6 +8,8 @@
 // Configuration for your app
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
 
+require("dotenv").config()
+
 const { configure } = require("quasar/wrappers")
 
 module.exports = configure(function (/* ctx */) {
@@ -62,7 +64,9 @@ module.exports = configure(function (/* ctx */) {
 
             // publicPath: '/',
             // analyze: true,
-            // env: {},
+            env: {
+                FUNCTIONS_BASE_URL: process.env.FUNCTIONS_BASE_URL || "http://localhost:5001/rainerio-invoices/us-central1",
+            },
             // rawDefine: {}
             // ignorePublicFolder: true,
             // minify: false,

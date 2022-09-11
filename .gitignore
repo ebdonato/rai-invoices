@@ -1,6 +1,7 @@
 .DS_Store
 .thumbs.db
 node_modules
+.env
 
 # Quasar core related directories
 .quasar
@@ -27,7 +28,6 @@ yarn-error.log*
 *.ntvs*
 *.njsproj
 *.sln
-
 
 # Firebase
 .firebase
