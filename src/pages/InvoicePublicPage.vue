@@ -7,7 +7,7 @@
             </div>
             <div class="column content-center">Orçamento: {{ invoiceId }}</div>
         </div>
-        <div v-else class="column content-center q-pa-xs q-gutter-xs public-view">
+        <div v-else class="column content-center q-pa-xs q-gutter-xs public-view" id="invoice">
             <InfoPublicHeader :userId="userId" @error="(message) => (errorMessage = message)" />
             <q-card flat bordered :dark="false" class="print-card">
                 <q-card-section class="q-pa-xs">
@@ -57,6 +57,12 @@
                 </q-card-section>
             </q-card>
         </div>
+        <q-page-sticky position="bottom-right" :offset="[18, 18]" class="no-print">
+            <div class="q-gutter-sm">
+                <q-btn fab icon="print" color="primary" @click="print" />
+                <q-btn fab icon="file_download" color="primary" @click="saveAsPDF" />
+            </div>
+        </q-page-sticky>
     </q-page>
 </template>
 
@@ -65,6 +71,7 @@ import { reactive, ref } from "vue"
 import { getFirestore, doc, getDoc } from "firebase/firestore"
 import { formatCPForCNPJ, formatCurrency, formatNumber } from "assets/customFormatters"
 import { useQuasar, date } from "quasar"
+import html2pdf from "html2pdf.js"
 
 import InfoPublicHeader from "components/InfoPublicHeader.vue"
 
@@ -115,6 +122,12 @@ const defaultDueDate = () => {
     return date.formatDate(dueDate, "DD/MM/YYYY")
 }
 
+const reverseDate = () => {
+    const [day, month, year] = invoice.date.split("/")
+    const invoiceDate = new Date(+year, +month - 1, +day)
+    return date.formatDate(invoiceDate, "YYYY-MM-DD")
+}
+
 const loadData = async () => {
     $q.loading.show()
 
@@ -131,6 +144,22 @@ const loadData = async () => {
     } finally {
         $q.loading.hide()
     }
+}
+
+const saveAsPDF = () => {
+    const element = document.getElementById("invoice")
+
+    const options = {
+        margin: 4,
+    }
+
+    const filename = `Orçamento ${reverseDate()} ID ${props.invoiceId}`
+
+    html2pdf().set(options).from(element).save(filename)
+}
+
+const print = () => {
+    window.print()
 }
 
 loadData()

@@ -7,7 +7,7 @@
             </div>
             <div class="column content-center">Orçamento: {{ receiptId }}</div>
         </div>
-        <div v-else class="column content-center q-pa-xs q-gutter-xs public-view">
+        <div v-else class="column content-center q-pa-xs q-gutter-xs public-view" id="receipt">
             <InfoPublicHeader :userId="userId" @error="(message) => (errorMessage = message)" @username="(name) => (username = name)" />
             <q-card flat bordered :dark="false" class="print-card q-py-xs q-px-md" :style="{ 'flex-grow': '1' }">
                 <div class="text-center text-h3">Recibo</div>
@@ -33,18 +33,25 @@
                 </div>
             </q-card>
         </div>
+        <q-page-sticky position="bottom-right" :offset="[18, 18]" class="no-print">
+            <div class="q-gutter-sm">
+                <q-btn fab icon="print" color="primary" @click="print" />
+                <q-btn fab icon="file_download" color="primary" @click="saveAsPDF" />
+            </div>
+        </q-page-sticky>
     </q-page>
 </template>
 
 <script setup>
 import { reactive, ref } from "vue"
 import { getFirestore, doc, getDoc } from "firebase/firestore"
-import { useQuasar } from "quasar"
+import { useQuasar, date } from "quasar"
 import { formatLocal, formatCurrency } from "assets/customFormatters"
 
 import InfoPublicHeader from "components/InfoPublicHeader.vue"
 
 import n2wordsPT from "n2words/lib/i18n/PT.mjs"
+import html2pdf from "html2pdf.js"
 
 const $q = useQuasar()
 
@@ -109,6 +116,28 @@ const loadData = async () => {
     } finally {
         $q.loading.hide()
     }
+}
+
+const reverseDate = () => {
+    const [day, month, year] = receipt.date.split("/")
+    const receiptDate = new Date(+year, +month - 1, +day)
+    return date.formatDate(receiptDate, "YYYY-MM-DD")
+}
+
+const saveAsPDF = () => {
+    const element = document.getElementById("receipt")
+
+    const options = {
+        margin: 4,
+    }
+
+    const filename = `Recibo ${reverseDate()} ID ${props.receiptId}`
+
+    html2pdf().set(options).from(element).save(filename)
+}
+
+const print = () => {
+    window.print()
 }
 
 loadData()
