@@ -55,6 +55,7 @@
                             <DocumentAction :doc-id="receipt.id" :user-id="user.uid" :userInfoName="userInfoName" doc-type="receipt" @edit="onEdit(receipt.id)" />
                         </q-card-actions>
                     </q-card>
+                    <q-banner v-if="receipts.length === 0" rounded inline-actions class="full-width">Nenhum item {{ filter ? "encontrado" : "cadastrado" }}</q-banner>
                 </div>
 
                 <div style="min-height: 70px"></div>
