@@ -56,7 +56,11 @@
                     </q-card>
                 </div>
 
-                <div style="min-height: 70px"></div>
+                <div style="min-height: 70px" class="flex column justify-center align-center">
+                    <div class="text-center" v-if="showLoadMoreButton">
+                        <q-btn color="primary" @click="onLoadMore"> Carregar mais itens </q-btn>
+                    </div>
+                </div>
             </q-scroll-area>
         </div>
         <q-page-sticky position="bottom-right" :offset="[18, 18]">
@@ -73,7 +77,7 @@ import { ref, onMounted, onUnmounted } from "vue"
 import { useQuasar } from "quasar"
 import { UseMouseInElement } from "@vueuse/components"
 
-import { getFirestore, collection, query, where, orderBy, limit, onSnapshot } from "firebase/firestore"
+import { getFirestore, collection, query, where, orderBy, limit, getDocs, startAfter } from "firebase/firestore"
 import { getAuth } from "firebase/auth"
 
 import { formatCPForCNPJ, formatPhone } from "assets/customFormatters"
@@ -86,21 +90,30 @@ const db = getFirestore($q.firebaseApp)
 
 const customers = ref([])
 const filter = ref("")
-let unsubscribe = null
 
 const user = getAuth().currentUser
 const collectionRef = collection(db, `users/${user.uid}/customers`)
 
-const onQueryData = () => {
+const MAX_DOCS = parseInt(process.env.MAX_DOCS) || 10
+let lastVisible = null
+const showLoadMoreButton = ref(false)
+const queryData = async () => {
     $q.loading.show()
 
-    unsubscribe?.()
+    const q = query(collectionRef, orderBy("name"), startAfter(lastVisible ?? 0), where("name", ">=", filter.value), where("name", "<=", filter.value + "~"), limit(MAX_DOCS))
 
-    const q = query(collectionRef, orderBy("name"), limit(20), where("name", ">=", filter.value), where("name", "<=", filter.value + "~"))
+    try {
+        const documentSnapshots = await getDocs(q)
 
-    const querySnapshot = (querySnapshot) => {
+        const numberOfDocuments = documentSnapshots.docs.length
+
+        showLoadMoreButton.value = numberOfDocuments >= MAX_DOCS
+
+        console.log(`Get ${numberOfDocuments} docs`)
+
         const firestoreData = []
-        querySnapshot.forEach((doc) => {
+
+        documentSnapshots.docs.forEach((doc) => {
             const { name, contact, phone, person, nationalRegistration } = doc.data()
 
             firestoreData.push({
@@ -113,12 +126,30 @@ const onQueryData = () => {
             })
         })
 
-        customers.value = [...firestoreData]
+        lastVisible = documentSnapshots.docs.at(-1)
 
+        customers.value.push(...firestoreData)
+    } catch (error) {
+        console.error(error)
+
+        $q.notify({
+            type: "negative",
+            message: "Erro ao obter dados",
+            caption: error.message,
+        })
+    } finally {
         $q.loading.hide()
     }
+}
 
-    unsubscribe = onSnapshot(q, querySnapshot)
+const onLoadMore = () => {
+    queryData()
+}
+
+const onQueryData = () => {
+    lastVisible = null
+    customers.value = []
+    queryData()
 }
 
 const onCancelFilter = () => {
@@ -132,12 +163,16 @@ const onEdit = (id) => {
         componentProps: {
             id,
         },
+    }).onOk(() => {
+        onQueryData()
     })
 }
 
 const onNew = () => {
     $q.dialog({
         component: CustomerDialog,
+    }).onOk(() => {
+        onQueryData()
     })
 }
 
@@ -147,9 +182,5 @@ onMounted(() => {
     filter.value = customerFilterString?.filter ?? ""
 
     onQueryData()
-})
-
-onUnmounted(() => {
-    unsubscribe?.()
 })
 </script>
