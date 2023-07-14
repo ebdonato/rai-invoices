@@ -9,10 +9,10 @@
                             <q-icon name="receipt_long" />
                         </template>
                         <template v-slot:action>
-                            <q-input color="secondary" dense v-model="filter" placeholder="Procurar" dark class="q-ml-sm" @keydown.enter="onQueryData">
+                            <q-input color="secondary" dense v-model="filter" placeholder="Procurar" dark class="q-ml-sm" @keydown.enter="onSearch">
                                 <q-tooltip :delay="1000"> Procurar por Cliente começando com ... </q-tooltip>
                                 <template v-slot:append>
-                                    <q-icon name="search" @click="onQueryData" />
+                                    <q-icon name="search" @click="onSearch" />
                                 </template>
                                 <template v-slot:prepend>
                                     <q-icon v-if="filter" name="cancel" @click="onCancelFilter" />
@@ -60,7 +60,11 @@
                     </q-card>
                 </div>
 
-                <div style="min-height: 70px"></div>
+                <div style="min-height: 70px" class="flex column justify-center align-center">
+                    <div class="text-center" v-if="showLoadMoreButton">
+                        <q-btn color="primary" @click="onQueryData"> Carregar mais itens </q-btn>
+                    </div>
+                </div>
             </q-scroll-area>
         </div>
         <q-page-sticky position="bottom-right" :offset="[18, 18]">
@@ -73,17 +77,19 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue"
+import { ref, onMounted } from "vue"
 import { useQuasar } from "quasar"
 import { UseMouseInElement } from "@vueuse/components"
 import { useRouter } from "vue-router"
 
-import { getFirestore, collection, query, where, orderBy, limit, onSnapshot, doc, getDoc } from "firebase/firestore"
+import { getFirestore, collection, query, where, orderBy, limit, doc, getDoc, getDocs, startAfter } from "firebase/firestore"
 import { getAuth } from "firebase/auth"
 
 import { formatCurrency } from "assets/customFormatters"
 
 import DocumentAction from "components/DocumentAction.vue"
+
+const MAX_DOCS = parseInt(process.env.MAX_DOCS) || 10
 
 const $q = useQuasar()
 
@@ -93,7 +99,6 @@ const db = getFirestore($q.firebaseApp)
 
 const invoices = ref([])
 const filter = ref("")
-let unsubscribe = null
 
 const user = getAuth().currentUser
 const collectionRef = collection(db, `users/${user.uid}/invoices`)
@@ -134,16 +139,32 @@ const onLoad = () => {
         })
 }
 
-const onQueryData = () => {
+let lastVisible = null
+const showLoadMoreButton = ref(false)
+const onQueryData = async () => {
     $q.loading.show()
 
-    unsubscribe?.()
+    const q = query(
+        collectionRef,
+        orderBy("customer.name"),
+        startAfter(lastVisible ?? 0),
+        where("customer.name", ">=", filter.value),
+        where("customer.name", "<=", filter.value + "~"),
+        limit(MAX_DOCS)
+    )
 
-    const q = query(collectionRef, orderBy("customer.name"), limit(20), where("customer.name", ">=", filter.value), where("customer.name", "<=", filter.value + "~"))
+    try {
+        const documentSnapshots = await getDocs(q)
 
-    const querySnapshot = (querySnapshot) => {
+        const numberOfDocuments = documentSnapshots.docs.length
+
+        showLoadMoreButton.value = numberOfDocuments >= MAX_DOCS
+
+        console.log(`Get ${numberOfDocuments} docs`)
+
         const firestoreData = []
-        querySnapshot.forEach((doc) => {
+
+        documentSnapshots.docs.forEach((doc) => {
             const { customer, date, dueDate, items } = doc.data()
 
             firestoreData.push({
@@ -155,16 +176,32 @@ const onQueryData = () => {
             })
         })
 
-        invoices.value = [...firestoreData]
+        lastVisible = documentSnapshots.docs.at(-1)
 
+        invoices.value.push(...firestoreData)
+    } catch (error) {
+        console.error(error)
+
+        $q.notify({
+            type: "negative",
+            message: "Erro ao obter dados",
+            caption: error.message,
+        })
+    } finally {
         $q.loading.hide()
     }
+}
 
-    unsubscribe = onSnapshot(q, querySnapshot)
+const onSearch = () => {
+    lastVisible = null
+    invoices.value = []
+    onQueryData()
 }
 
 const onCancelFilter = () => {
     filter.value = ""
+    lastVisible = null
+    invoices.value = []
     onQueryData()
 }
 
@@ -180,10 +217,6 @@ onMounted(() => {
     onQueryData()
 
     onLoad()
-})
-
-onUnmounted(() => {
-    unsubscribe?.()
 })
 </script>
 

@@ -66,6 +66,7 @@ module.exports = configure(function (/* ctx */) {
             // analyze: true,
             env: {
                 FUNCTIONS_BASE_URL: process.env.FUNCTIONS_BASE_URL || "http://localhost:5001/rainerio-invoices/us-central1",
+                MAX_DOCS: process.env.MAX_DOCS || 10,
             },
             // rawDefine: {}
             // ignorePublicFolder: true,
