@@ -9,10 +9,10 @@
                             <q-icon name="receipt_long" />
                         </template>
                         <template v-slot:action>
-                            <q-input color="secondary" dense v-model="filter" placeholder="Procurar" dark class="q-ml-sm" @keydown.enter="onSearch">
+                            <q-input color="secondary" dense v-model="filter" placeholder="Procurar" dark class="q-ml-sm" @keydown.enter="onQueryData">
                                 <q-tooltip :delay="1000"> Procurar por Cliente começando com ... </q-tooltip>
                                 <template v-slot:append>
-                                    <q-icon name="search" @click="onSearch" />
+                                    <q-icon name="search" @click="onQueryData" />
                                 </template>
                                 <template v-slot:prepend>
                                     <q-icon v-if="filter" name="cancel" @click="onCancelFilter" />
@@ -142,7 +142,7 @@ const onLoad = () => {
 
 let lastVisible = null
 const showLoadMoreButton = ref(false)
-const onQueryData = async () => {
+const queryData = async () => {
     $q.loading.show()
 
     const q = query(
@@ -193,16 +193,14 @@ const onQueryData = async () => {
     }
 }
 
-const onSearch = () => {
+const onQueryData = () => {
     lastVisible = null
     invoices.value = []
-    onQueryData()
+    queryData()
 }
 
 const onCancelFilter = () => {
     filter.value = ""
-    lastVisible = null
-    invoices.value = []
     onQueryData()
 }
 
