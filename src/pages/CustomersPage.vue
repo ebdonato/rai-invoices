@@ -54,6 +54,7 @@
                             </div>
                         </q-card-section>
                     </q-card>
+                    <q-banner v-if="customers.length === 0" rounded inline-actions class="full-width">Nenhum item {{ filter ? "encontrado" : "cadastrado" }}</q-banner>
                 </div>
 
                 <div style="min-height: 70px" class="flex column justify-center align-center">
