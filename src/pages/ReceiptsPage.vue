@@ -58,7 +58,11 @@
                     <q-banner v-if="receipts.length === 0" rounded inline-actions class="full-width">Nenhum item {{ filter ? "encontrado" : "cadastrado" }}</q-banner>
                 </div>
 
-                <div style="min-height: 70px"></div>
+                <div style="min-height: 70px" class="flex column justify-center align-center">
+                    <div class="text-center" v-if="showLoadMoreButton">
+                        <q-btn color="primary" @click="onQueryData"> Carregar mais itens </q-btn>
+                    </div>
+                </div>
             </q-scroll-area>
         </div>
         <q-page-sticky position="bottom-right" :offset="[18, 18]">
@@ -71,11 +75,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue"
+import { ref, onMounted } from "vue"
 import { useQuasar } from "quasar"
 import { UseMouseInElement } from "@vueuse/components"
 
-import { getFirestore, collection, query, where, orderBy, limit, onSnapshot, doc, getDoc } from "firebase/firestore"
+import { getFirestore, collection, query, where, orderBy, limit, startAfter, doc, getDoc, getDocs } from "firebase/firestore"
 import { getAuth } from "firebase/auth"
 
 import DocumentAction from "components/DocumentAction.vue"
@@ -83,13 +87,14 @@ import ReceiptDialog from "components/ReceiptDialog.vue"
 
 import { formatLocal, formatCurrency } from "assets/customFormatters"
 
+const MAX_DOCS = parseInt(process.env.MAX_DOCS) || 10
+
 const $q = useQuasar()
 
 const db = getFirestore($q.firebaseApp)
 
 const receipts = ref([])
 const filter = ref("")
-let unsubscribe = null
 
 const user = getAuth().currentUser
 const collectionRef = collection(db, `users/${user.uid}/receipts`)
@@ -126,16 +131,32 @@ const onLoad = () => {
         })
 }
 
-const onQueryData = () => {
+let lastVisible = null
+const showLoadMoreButton = ref(false)
+const queryData = async () => {
     $q.loading.show()
 
-    unsubscribe?.()
+    const q = query(
+        collectionRef,
+        orderBy("customer.name"),
+        startAfter(lastVisible ?? 0),
+        where("customer.name", ">=", filter.value),
+        where("customer.name", "<=", filter.value + "~"),
+        limit(10)
+    )
 
-    const q = query(collectionRef, orderBy("customer.name"), limit(20), where("customer.name", ">=", filter.value), where("customer.name", "<=", filter.value + "~"))
+    try {
+        const documentSnapshots = await getDocs(q)
 
-    const querySnapshot = (querySnapshot) => {
+        const numberOfDocuments = documentSnapshots.docs.length
+
+        showLoadMoreButton.value = numberOfDocuments >= MAX_DOCS
+
+        console.log(`Get ${numberOfDocuments} docs`)
+
         const firestoreData = []
-        querySnapshot.forEach((doc) => {
+
+        documentSnapshots.docs.forEach((doc) => {
             const { customerName, date, details, value, city, state } = doc.data()
 
             firestoreData.push({
@@ -149,12 +170,26 @@ const onQueryData = () => {
             })
         })
 
-        receipts.value = [...firestoreData]
+        lastVisible = documentSnapshots.docs.at(-1)
 
+        receipts.value.push(...firestoreData)
+    } catch (error) {
+        console.error(error)
+
+        $q.notify({
+            type: "negative",
+            message: "Erro ao obter dados",
+            caption: error.message,
+        })
+    } finally {
         $q.loading.hide()
     }
+}
 
-    unsubscribe = onSnapshot(q, querySnapshot)
+const onQueryData = () => {
+    lastVisible = null
+    receipts.value = []
+    queryData()
 }
 
 const onCancelFilter = () => {
@@ -168,12 +203,16 @@ const onEdit = (id) => {
         componentProps: {
             id,
         },
+    }).onOk(() => {
+        onQueryData()
     })
 }
 
 const onNew = () => {
     $q.dialog({
         component: ReceiptDialog,
+    }).onOk(() => {
+        onQueryData()
     })
 }
 
@@ -185,9 +224,5 @@ onMounted(() => {
     onQueryData()
 
     onLoad()
-})
-
-onUnmounted(() => {
-    unsubscribe?.()
 })
 </script>
