@@ -114,10 +114,11 @@
 
 <script setup>
 import { useDialogPluginComponent, useQuasar, date } from "quasar"
-import { getFirestore, collection, query, where, orderBy, limit, doc, getDoc, getDocs, setDoc, deleteDoc } from "firebase/firestore"
+import { getFirestore, collection, query, where, orderBy, limit, doc, getDoc, getDocs, setDoc, deleteDoc, updateDoc, startAfter, serverTimestamp } from "firebase/firestore"
 import { getAuth } from "firebase/auth"
 import { ref, onMounted, reactive } from "vue"
-import { nanoid } from "nanoid"
+import removeAccents from "remove-accents"
+
 import { formatCPForCNPJ } from "assets/customFormatters"
 
 defineEmits([...useDialogPluginComponent.emits])
@@ -152,9 +153,20 @@ const props = defineProps({
 const customerCollectionRef = collection(db, `users/${user.uid}/customers`)
 
 const queryCustomers = async (filter = "") => {
-    const q = query(customerCollectionRef, orderBy("name"), limit(20), where("name", ">=", filter), where("name", "<=", filter + "~"))
+    const q = query(
+        customerCollectionRef,
+        orderBy("searchableCustomerName"),
+        startAfter(0),
+        where("searchableCustomerName", ">=", filter),
+        where("searchableCustomerName", "<=", filter + "~"),
+        limit(20)
+    )
 
     const querySnapshot = await getDocs(q)
+
+    const numberOfDocuments = querySnapshot.docs.length
+
+    console.log(`Get ${numberOfDocuments} docs`)
 
     const customer = []
 
@@ -228,11 +240,17 @@ const getReceipt = (id) => {
 const onSubmit = () => {
     $q.loading.show()
 
-    const docRef = doc(db, receiptsPath, props.id ?? nanoid())
+    const docRef = doc(db, receiptsPath, props.id ?? Date.now().toString())
 
     receipt.customerName = receipt.customer.name
+    receipt.searchableCustomerName = removeAccents(receipt.customer.name).toLowerCase()
+    if (!props.id) {
+        receipt.createdAt = serverTimestamp()
+    }
 
-    setDoc(docRef, receipt)
+    const promise = props.id ? updateDoc : setDoc
+
+    promise(docRef, receipt)
         .then(() => {
             onDialogOK()
 
