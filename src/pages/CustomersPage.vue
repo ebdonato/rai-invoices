@@ -74,7 +74,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue"
+import { ref, onMounted } from "vue"
 import { useQuasar } from "quasar"
 import { UseMouseInElement } from "@vueuse/components"
 
