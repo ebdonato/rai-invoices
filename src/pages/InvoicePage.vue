@@ -153,9 +153,10 @@
 import { ref, reactive, onMounted } from "vue"
 import { useQuasar, date } from "quasar"
 import { onBeforeRouteLeave, useRouter } from "vue-router"
-import { getFirestore, collection, query, where, orderBy, limit, doc, getDoc, getDocs, setDoc, deleteDoc } from "firebase/firestore"
+import { getFirestore, collection, query, where, orderBy, limit, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, startAfter, serverTimestamp } from "firebase/firestore"
 import { getAuth } from "firebase/auth"
-import { nanoid } from "nanoid"
+import removeAccents from "remove-accents"
+
 import { formatCPForCNPJ, formatCurrency } from "assets/customFormatters"
 
 const $q = useQuasar()
@@ -195,9 +196,20 @@ const totalValue = () => {
 }
 
 const queryCustomers = async (filter = "") => {
-    const q = query(customerCollectionRef, orderBy("name"), limit(20), where("name", ">=", filter), where("name", "<=", filter + "~"))
+    const q = query(
+        customerCollectionRef,
+        orderBy("searchableCustomerName"),
+        startAfter(0),
+        where("searchableCustomerName", ">=", filter),
+        where("searchableCustomerName", "<=", filter + "~"),
+        limit(20)
+    )
 
     const querySnapshot = await getDocs(q)
+
+    const numberOfDocuments = querySnapshot.docs.length
+
+    console.log(`Get ${numberOfDocuments} docs`)
 
     const customer = []
 
@@ -281,9 +293,15 @@ const onSubmit = () => {
     const docRef = doc(db, invoicePath, props.id ?? Date.now().toString())
 
     invoice.customerName = invoice.customer.name
+    invoice.searchableCustomerName = removeAccents(invoice.customer.name).toLowerCase()
     invoice.note = /^(<br>)|(<div><br><\/div>)+$/.test(invoice.note.trim()) ? "" : invoice.note.trim()
+    if (!props.id) {
+        invoice.createdAt = serverTimestamp()
+    }
 
-    setDoc(docRef, invoice)
+    const promise = props.id ? updateDoc : setDoc
+
+    promise(docRef, invoice)
         .then(() => {
             touched.value = false
 
