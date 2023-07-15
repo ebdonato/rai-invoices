@@ -63,7 +63,7 @@
 
                 <div style="min-height: 70px" class="flex column justify-center align-center">
                     <div class="text-center" v-if="showLoadMoreButton">
-                        <q-btn color="primary" @click="onQueryData"> Carregar mais itens </q-btn>
+                        <q-btn color="primary" @click="onLoadMore"> Carregar mais itens </q-btn>
                     </div>
                 </div>
             </q-scroll-area>
@@ -191,6 +191,10 @@ const queryData = async () => {
     } finally {
         $q.loading.hide()
     }
+}
+
+const onLoadMore = () => {
+    queryData()
 }
 
 const onQueryData = () => {
