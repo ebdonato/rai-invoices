@@ -44,11 +44,12 @@
 
 <script setup>
 import { useDialogPluginComponent, useQuasar } from "quasar"
-import { getFirestore, doc, getDoc, setDoc, deleteDoc } from "firebase/firestore"
+import { getFirestore, doc, getDoc, setDoc, deleteDoc, updateDoc, serverTimestamp } from "firebase/firestore"
 import { getAuth } from "firebase/auth"
 import { ref, onMounted, reactive } from "vue"
 import { nanoid } from "nanoid"
 import { cpf, cnpj } from "cpf-cnpj-validator"
+import removeAccents from "remove-accents"
 
 defineEmits([...useDialogPluginComponent.emits])
 
@@ -123,13 +124,17 @@ const onSubmit = () => {
 
     const document = {
         name: customer.name,
+        searchableCustomerName: removeAccents(customer.name).toLowerCase(),
         contact: customer.contact,
         phone: customer.phone,
         person: customer.person,
         nationalRegistration: customer.nationalRegistration,
+        ...(!props.id && { createdAt: serverTimestamp() }),
     }
 
-    setDoc(docRef, document)
+    const promise = props.id ? updateDoc : setDoc
+
+    promise(docRef, document)
         .then(() => {
             onDialogOK()
 

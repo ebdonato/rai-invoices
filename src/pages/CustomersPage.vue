@@ -78,7 +78,7 @@ import { ref, onMounted } from "vue"
 import { useQuasar } from "quasar"
 import { UseMouseInElement } from "@vueuse/components"
 
-import { getFirestore, collection, query, where, orderBy, limit, getDocs, startAfter } from "firebase/firestore"
+import { getFirestore, collection, query, where, orderBy, limit, getDocs, startAfter, endBefore } from "firebase/firestore"
 import { getAuth } from "firebase/auth"
 
 import { formatCPForCNPJ, formatPhone } from "assets/customFormatters"
@@ -97,11 +97,21 @@ const collectionRef = collection(db, `users/${user.uid}/customers`)
 
 const MAX_DOCS = parseInt(process.env.MAX_DOCS) || 10
 let lastVisible = null
+let firstVisible = null
 const showLoadMoreButton = ref(false)
 const queryData = async () => {
     $q.loading.show()
 
-    const q = query(collectionRef, orderBy("name"), startAfter(lastVisible ?? 0), where("name", ">=", filter.value), where("name", "<=", filter.value + "~"), limit(MAX_DOCS))
+    const q = filter.value
+        ? query(
+              collectionRef,
+              orderBy("searchableCustomerName"),
+              startAfter(lastVisible ?? 0),
+              where("searchableCustomerName", ">=", filter.value),
+              where("searchableCustomerName", "<=", filter.value + "~"),
+              limit(MAX_DOCS)
+          )
+        : query(collectionRef, orderBy("createdAt", "desc"), endBefore(firstVisible ?? 0), limit(MAX_DOCS))
 
     try {
         const documentSnapshots = await getDocs(q)
@@ -127,6 +137,7 @@ const queryData = async () => {
             })
         })
 
+        firstVisible = documentSnapshots.docs.at(0)
         lastVisible = documentSnapshots.docs.at(-1)
 
         customers.value.push(...firestoreData)
@@ -149,6 +160,7 @@ const onLoadMore = () => {
 
 const onQueryData = () => {
     lastVisible = null
+    firstVisible = null
     customers.value = []
     queryData()
 }
