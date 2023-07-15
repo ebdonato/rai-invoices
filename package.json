@@ -24,6 +24,7 @@
         "n2words": "^1.11.1",
         "nanoid": "^4.0.0",
         "quasar": "^2.6.0",
+        "remove-accents": "^0.4.4",
         "vue": "^3.0.0",
         "vue-3-sanitize": "^0.1.4",
         "vue-router": "^4.0.0"
@@ -35,6 +36,7 @@
         "eslint": "^8.10.0",
         "eslint-config-prettier": "^8.1.0",
         "eslint-plugin-vue": "^8.5.0",
+        "firebase-admin": "^11.10.1",
         "firebase-tools": "^11.22.0",
         "prettier": "^2.5.1"
     },
