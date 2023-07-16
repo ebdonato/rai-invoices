@@ -21,29 +21,14 @@
                         :rules="[(val) => (!isNaN(val) && val > 0) || 'Valor inválido']"
                         @update:model-value="touched = true"
                     />
-                    <q-select
-                        outlined
-                        v-model="receipt.customer"
-                        :options="customerOptions"
-                        label="Cliente"
-                        class="items"
-                        emit-value
-                        map-options
-                        lazy-rules
-                        :rules="[(val) => !!val || 'Campo obrigatório']"
-                        use-input
-                        @filter="onFilterCustomer"
-                        @update:model-value="touched = true"
-                    >
-                        <template v-slot:option="scope">
-                            <q-item v-bind="scope.itemProps">
-                                <q-item-section>
-                                    <q-item-label>{{ scope.opt.label }}</q-item-label>
-                                    <q-item-label caption>{{ scope.opt.caption }}</q-item-label>
-                                </q-item-section>
-                            </q-item>
+                    <q-field outlined label="Cliente" stack-label class="items" v-model="receipt.customerName" :rules="[(val) => !!val || 'Campo obrigatório']">
+                        <template v-slot:control="props">
+                            <div class="self-center full-width no-outline" tabindex="0">{{ props.modelValue }}</div>
                         </template>
-                    </q-select>
+                        <template v-slot:append>
+                            <q-icon name="search" class="cursor-pointer" @click="onPickCustomer" />
+                        </template>
+                    </q-field>
                     <q-input
                         outlined
                         v-model="receipt.date"
@@ -114,12 +99,12 @@
 
 <script setup>
 import { useDialogPluginComponent, useQuasar, date } from "quasar"
-import { getFirestore, collection, query, where, orderBy, limit, doc, getDoc, getDocs, setDoc, deleteDoc, updateDoc, startAfter, serverTimestamp } from "firebase/firestore"
+import { getFirestore, doc, getDoc, setDoc, deleteDoc, updateDoc, serverTimestamp } from "firebase/firestore"
 import { getAuth } from "firebase/auth"
 import { ref, onMounted, reactive } from "vue"
 import removeAccents from "remove-accents"
 
-import { formatCPForCNPJ } from "assets/customFormatters"
+import PickCustomerDialog from "components/PickCustomerDialog.vue"
 
 defineEmits([...useDialogPluginComponent.emits])
 
@@ -128,6 +113,7 @@ const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginC
 const $q = useQuasar()
 
 const receipt = reactive({
+    customerName: "",
     customer: null,
     date: date.formatDate(Date.now(), "DD/MM/YYYY"),
     value: 0,
@@ -150,60 +136,6 @@ const props = defineProps({
     },
 })
 
-const customerCollectionRef = collection(db, `users/${user.uid}/customers`)
-
-const queryCustomers = async (filter = "") => {
-    const q = query(
-        customerCollectionRef,
-        orderBy("searchableCustomerName"),
-        startAfter(0),
-        where("searchableCustomerName", ">=", filter),
-        where("searchableCustomerName", "<=", filter + "~"),
-        limit(20)
-    )
-
-    const querySnapshot = await getDocs(q)
-
-    const numberOfDocuments = querySnapshot.docs.length
-
-    console.log(`Get ${numberOfDocuments} docs`)
-
-    const customer = []
-
-    querySnapshot.forEach((doc) => {
-        const { name, contact, phone, person, nationalRegistration: rawNationalRegistration } = doc.data()
-
-        const nationalRegistration = formatCPForCNPJ(rawNationalRegistration)
-
-        customer.push({
-            label: name,
-            caption: nationalRegistration || "- - -",
-            value: {
-                id: doc.id,
-                person,
-                name,
-                nationalRegistration: rawNationalRegistration,
-                contact,
-                phone,
-            },
-        })
-    })
-
-    return [...customer]
-}
-
-const customerOptions = ref([])
-
-const onFilterCustomer = (inputValue, doneFn, abortFn) => {
-    queryCustomers(inputValue)
-        .then((customers) => {
-            doneFn(() => (customerOptions.value = customers))
-        })
-        .catch(() => {
-            abortFn(() => (customerOptions.value = []))
-        })
-}
-
 const receiptsPath = `users/${user.uid}/receipts`
 
 const getReceipt = (id) => {
@@ -214,8 +146,8 @@ const getReceipt = (id) => {
     getDoc(docRef)
         .then((docSnap) => {
             if (docSnap.exists()) {
-                const { customer = null, date = "", value = 0, details = "", state, city } = docSnap.data()
-                Object.assign(receipt, { customer, date, value, details, state, city })
+                const { customerName = "", customer = null, date = "", value = 0, details = "", state, city } = docSnap.data()
+                Object.assign(receipt, { customerName, customer, date, value, details, state, city })
             } else {
                 // doc.data() will be undefined in this case
                 throw new Error("Documento não encontrado")
@@ -326,7 +258,6 @@ const onCancelClick = () => {
 }
 
 onMounted(() => {
-    queryCustomers().then((customers) => (customerOptions.value = customers))
     props.id && getReceipt(props.id)
     getCities(receipt.state)
         .then((response) => {
@@ -338,6 +269,21 @@ onMounted(() => {
             citiesFiltered.value = []
         })
 })
+
+const onPickCustomer = () => {
+    const initialValue = receipt.customerName
+
+    $q.dialog({
+        component: PickCustomerDialog,
+        componentProps: {
+            initialValue,
+        },
+    }).onOk((customer) => {
+        receipt.customer = customer
+        receipt.customerName = customer.name
+        touched.value = true
+    })
+}
 
 const cities = ref([])
 const citiesFiltered = ref([])
