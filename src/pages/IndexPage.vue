@@ -1,7 +1,7 @@
 <template>
     <q-page class="flex flex-center">
-        <div class="row wrap justify-center big q-gutter-sm">
-            <div class="column justify-center items-end q-gutter-sm">
+        <div class="column wrap big q-gutter-sm">
+            <div class="column justify-center items-center q-gutter-sm">
                 <div v-if="uploadLogo" class="column justify-center">
                     <LogoUploader
                         ref="uploader"
@@ -38,12 +38,14 @@
                 </div>
             </div>
 
-            <div class="column justify-center items-start q-gutter-sm">
+            <div class="column justify-center items-center q-gutter-sm">
                 <q-btn v-for="({ name, label, icon }, key) in options" :key="key" unelevated color="primary" :to="{ name }" class="button">
                     <q-icon left size="3em" :name="icon" />
                     <div class="col-grow">{{ label }}</div>
                 </q-btn>
             </div>
+
+            <div class="column justify-center items-center text-primary text-overline">{{ version }}</div>
         </div>
     </q-page>
 </template>
@@ -55,6 +57,9 @@ import { useQuasar } from "quasar"
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore"
 
 import LogoUploader from "components/LogoUploader"
+import pkg from "../../package.json"
+
+const version = `v${pkg.version}`
 
 const options = [
     {
