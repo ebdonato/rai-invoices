@@ -27,7 +27,11 @@
                             <q-item clickable @click="onEdit(customer.id)">
                                 <q-tooltip :delay="1000"> Clique para editar ou excluir </q-tooltip>
                                 <q-item-section avatar>
-                                    <q-icon size="xl" :name="!isOutside ? 'edit' : customer.person == 'legal' ? 'business' : 'account_circle'" color="primary" />
+                                    <q-icon
+                                        size="xl"
+                                        :name="!isOutside ? 'edit' : customer.person == 'legal' ? 'business' : 'account_circle'"
+                                        :color="customer.active ? 'primary' : 'grey'"
+                                    />
                                 </q-item-section>
 
                                 <q-item-section>
@@ -122,7 +126,7 @@ const queryData = async () => {
         const firestoreData = []
 
         documentSnapshots.docs.forEach((doc) => {
-            const { name, contact, phone, person, nationalRegistration } = doc.data()
+            const { name, contact, phone, person, nationalRegistration, active = true } = doc.data()
 
             firestoreData.push({
                 id: doc.id,
@@ -131,6 +135,7 @@ const queryData = async () => {
                 nationalRegistration: formatCPForCNPJ(nationalRegistration),
                 contact,
                 phone: formatPhone(phone),
+                active,
             })
         })
 

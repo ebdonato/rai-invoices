@@ -22,8 +22,13 @@ const updateCustomersForUser = async (userId) => {
     customersQuerySnapshot.forEach((customerDoc) => {
         const customerName = customerDoc.get("name")
         const createdAt = customerDoc.get("createdAt")
+        const active = customerDoc.get("active")
 
-        batch.update(customerDoc.ref, { searchableCustomerName: removeAccents(customerName).toLowerCase(), createdAt: createdAt || FieldValue.serverTimestamp() })
+        batch.update(customerDoc.ref, {
+            searchableCustomerName: removeAccents(customerName).toLowerCase(),
+            createdAt: createdAt || FieldValue.serverTimestamp(),
+            active: active ?? true,
+        })
     })
 
     await batch.commit()

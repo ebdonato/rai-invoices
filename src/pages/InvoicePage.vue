@@ -8,29 +8,14 @@
                 </q-card-section>
 
                 <div class="q-pa-md row items-start justify-center q-gutter-md">
-                    <q-select
-                        outlined
-                        v-model="invoice.customer"
-                        :options="customerOptions"
-                        label="Cliente"
-                        class="items"
-                        emit-value
-                        map-options
-                        lazy-rules
-                        :rules="[(val) => !!val || 'Campo obrigatório']"
-                        use-input
-                        @filter="onFilterCustomer"
-                        @update:model-value="touched = true"
-                    >
-                        <template v-slot:option="scope">
-                            <q-item v-bind="scope.itemProps">
-                                <q-item-section>
-                                    <q-item-label>{{ scope.opt.label }}</q-item-label>
-                                    <q-item-label caption>{{ scope.opt.caption }}</q-item-label>
-                                </q-item-section>
-                            </q-item>
+                    <q-field outlined label="Cliente" stack-label class="items" v-model="invoice.customerName" :rules="[(val) => !!val || 'Campo obrigatório']">
+                        <template v-slot:control="props">
+                            <div class="self-center full-width no-outline" tabindex="0">{{ props.modelValue }}</div>
                         </template>
-                    </q-select>
+                        <template v-slot:append>
+                            <q-icon name="search" class="cursor-pointer" @click="onPickCustomer" />
+                        </template>
+                    </q-field>
                     <q-input
                         outlined
                         v-model="invoice.date"
@@ -153,11 +138,12 @@
 import { ref, reactive, onMounted } from "vue"
 import { useQuasar, date } from "quasar"
 import { onBeforeRouteLeave, useRouter } from "vue-router"
-import { getFirestore, collection, query, where, orderBy, limit, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, startAfter, serverTimestamp } from "firebase/firestore"
+import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, serverTimestamp } from "firebase/firestore"
 import { getAuth } from "firebase/auth"
 import removeAccents from "remove-accents"
 
-import { formatCPForCNPJ, formatCurrency } from "assets/customFormatters"
+import { formatCurrency } from "assets/customFormatters"
+import PickCustomerDialog from "components/PickCustomerDialog.vue"
 
 const $q = useQuasar()
 
@@ -178,6 +164,7 @@ const props = defineProps({
 })
 
 const invoice = reactive({
+    customerName: "",
     customer: null,
     date: date.formatDate(Date.now(), "DD/MM/YYYY"),
     dueDate: null,
@@ -185,54 +172,10 @@ const invoice = reactive({
     note: "",
 })
 
-const customerOptions = ref([])
-
-const customerCollectionRef = collection(db, `users/${user.uid}/customers`)
-
 const invoicePath = `users/${user.uid}/invoices`
 
 const totalValue = () => {
     return formatCurrency(invoice.items.reduce((acc, item) => acc + item.quantity * item.value, 0))
-}
-
-const queryCustomers = async (filter = "") => {
-    const q = query(
-        customerCollectionRef,
-        orderBy("searchableCustomerName"),
-        startAfter(0),
-        where("searchableCustomerName", ">=", filter),
-        where("searchableCustomerName", "<=", filter + "~"),
-        limit(20)
-    )
-
-    const querySnapshot = await getDocs(q)
-
-    const numberOfDocuments = querySnapshot.docs.length
-
-    console.log(`Get ${numberOfDocuments} docs`)
-
-    const customer = []
-
-    querySnapshot.forEach((doc) => {
-        const { name, contact, phone, person, nationalRegistration: rawNationalRegistration } = doc.data()
-
-        const nationalRegistration = formatCPForCNPJ(rawNationalRegistration)
-
-        customer.push({
-            label: name,
-            caption: nationalRegistration || "- - -",
-            value: {
-                id: doc.id,
-                person,
-                name,
-                nationalRegistration: rawNationalRegistration,
-                contact,
-                phone,
-            },
-        })
-    })
-
-    return [...customer]
 }
 
 const onAddItem = () => {
@@ -259,8 +202,9 @@ const getInvoice = (id) => {
     getDoc(docRef)
         .then((docSnap) => {
             if (docSnap.exists()) {
-                const { customer, date, dueDate, items = [], note = "" } = docSnap.data()
+                const { customer, customerName, date, dueDate, items = [], note = "" } = docSnap.data()
 
+                invoice.customerName = customerName
                 invoice.customer = customer
                 invoice.date = date
                 invoice.dueDate = dueDate
@@ -365,19 +309,23 @@ const onDelete = () => {
     })
 }
 
-const onFilterCustomer = (inputValue, doneFn, abortFn) => {
-    queryCustomers(inputValue)
-        .then((customers) => {
-            doneFn(() => (customerOptions.value = customers))
-        })
-        .catch(() => {
-            abortFn(() => (customerOptions.value = []))
-        })
+const onPickCustomer = () => {
+    const initialValue = invoice.customerName
+
+    $q.dialog({
+        component: PickCustomerDialog,
+        componentProps: {
+            initialValue,
+        },
+    }).onOk((customer) => {
+        invoice.customer = customer
+        invoice.customerName = customer.name
+        touched.value = true
+    })
 }
 
 onMounted(() => {
-    queryCustomers().then((customers) => (customerOptions.value = customers))
-    props.id && getInvoice(props.id)
+    !!props.id && getInvoice(props.id)
 })
 
 onBeforeRouteLeave((to, from, next) => {

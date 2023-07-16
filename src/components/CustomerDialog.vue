@@ -32,7 +32,7 @@
                 </q-card-section>
 
                 <q-card-actions>
-                    <q-btn v-if="!!props.id" color="red" label="Excluir" @click.prevent="onDelete" class="default-button" />
+                    <q-toggle v-model="customer.active" :label="customer.active ? 'Ativo' : 'Inativo'" />
                     <q-space />
                     <q-btn color="primary" label="Cancel" @click.prevent="onCancelClick" class="default-button" />
                     <q-btn color="primary" label="OK" type="submit" class="default-button" />
@@ -44,7 +44,7 @@
 
 <script setup>
 import { useDialogPluginComponent, useQuasar } from "quasar"
-import { getFirestore, doc, getDoc, setDoc, deleteDoc, updateDoc, serverTimestamp } from "firebase/firestore"
+import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore"
 import { getAuth } from "firebase/auth"
 import { ref, onMounted, reactive } from "vue"
 import { nanoid } from "nanoid"
@@ -68,7 +68,7 @@ const personOptions = [
     },
 ]
 
-const customer = reactive({ name: "", contact: "", phone: "", person: "legal", nationalRegistration: "" })
+const customer = reactive({ name: "", contact: "", phone: "", person: "legal", nationalRegistration: "", active: true })
 
 const touched = ref(false)
 
@@ -94,8 +94,8 @@ const getCustomer = (id) => {
     getDoc(docRef)
         .then((docSnap) => {
             if (docSnap.exists()) {
-                const { name = "", contact = "", phone = "", person = "legal", nationalRegistration = "" } = docSnap.data()
-                Object.assign(customer, { name, contact, phone, person, nationalRegistration })
+                const { name = "", contact = "", phone = "", person = "legal", nationalRegistration = "", active = true } = docSnap.data()
+                Object.assign(customer, { name, contact, phone, person, nationalRegistration, active })
             } else {
                 // doc.data() will be undefined in this case
                 throw new Error("Documento não encontrado")
@@ -129,6 +129,7 @@ const onSubmit = () => {
         phone: customer.phone,
         person: customer.person,
         nationalRegistration: customer.nationalRegistration,
+        active: customer.active,
         ...(!props.id && { createdAt: serverTimestamp() }),
     }
 
@@ -155,43 +156,6 @@ const onSubmit = () => {
         .finally(() => {
             $q.loading.hide()
         })
-}
-
-const onDelete = () => {
-    if (!props.id) return
-
-    $q.dialog({
-        title: "Excluir?",
-        message: "A exclusão não poderá ser desfeita",
-        cancel: true,
-        persistent: true,
-    }).onOk(() => {
-        $q.loading.show()
-
-        const docRef = doc(db, customersPath, props.id)
-
-        deleteDoc(docRef)
-            .then(() => {
-                onDialogOK()
-
-                $q.notify({
-                    type: "positive",
-                    message: "Cliente excluído com sucesso",
-                })
-            })
-            .catch((error) => {
-                console.error(error)
-
-                $q.notify({
-                    type: "negative",
-                    message: "Erro ao excluir dados",
-                    caption: error.message,
-                })
-            })
-            .finally(() => {
-                $q.loading.hide()
-            })
-    })
 }
 
 const onCancelClick = () => {
