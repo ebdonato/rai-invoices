@@ -82,6 +82,7 @@ import { ref, onMounted } from "vue"
 import { useQuasar } from "quasar"
 import { UseMouseInElement } from "@vueuse/components"
 import { useRouter } from "vue-router"
+import removeAccents from "remove-accents"
 
 import { getFirestore, collection, query, where, orderBy, limit, doc, getDoc, getDocs, startAfter, endBefore } from "firebase/firestore"
 import { getAuth } from "firebase/auth"
@@ -146,13 +147,15 @@ const showLoadMoreButton = ref(false)
 const queryData = async () => {
     $q.loading.show()
 
+    const searchBy = removeAccents(filter.value).toLowerCase()
+
     const q = filter.value
         ? query(
               collectionRef,
               orderBy("searchableCustomerName"),
               startAfter(lastVisible ?? 0),
-              where("searchableCustomerName", ">=", filter.value),
-              where("searchableCustomerName", "<=", filter.value + "~"),
+              where("searchableCustomerName", ">=", searchBy),
+              where("searchableCustomerName", "<=", searchBy + "~"),
               limit(MAX_DOCS)
           )
         : query(collectionRef, orderBy("createdAt", "desc"), endBefore(firstVisible ?? 0), limit(MAX_DOCS))

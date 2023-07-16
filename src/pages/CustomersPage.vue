@@ -84,6 +84,7 @@ import { UseMouseInElement } from "@vueuse/components"
 
 import { getFirestore, collection, query, where, orderBy, limit, getDocs, startAfter } from "firebase/firestore"
 import { getAuth } from "firebase/auth"
+import removeAccents from "remove-accents"
 
 import { formatCPForCNPJ, formatPhone } from "assets/customFormatters"
 
@@ -105,12 +106,14 @@ const showLoadMoreButton = ref(false)
 const queryData = async () => {
     $q.loading.show()
 
+    const searchBy = removeAccents(filter.value).toLowerCase()
+
     const q = query(
         collectionRef,
         orderBy("searchableCustomerName"),
         startAfter(lastVisible ?? 0),
-        where("searchableCustomerName", ">=", filter.value),
-        where("searchableCustomerName", "<=", filter.value + "~"),
+        where("searchableCustomerName", ">=", searchBy),
+        where("searchableCustomerName", "<=", searchBy + "~"),
         limit(MAX_DOCS)
     )
 
