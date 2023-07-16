@@ -120,9 +120,7 @@ async function queryCustomers(filter = "") {
 }
 
 onMounted(() => {
-    console.log("🚀 ~ file: PickCustomerDialog.vue:119 ~ queryCustomers ~ props.initialValue:", props.initialValue)
     queryCustomers(props.initialValue).then((customers) => {
-        console.log("🚀 ~ file: PickCustomerDialog.vue:119 ~ queryCustomers ~ customers:", customers)
         customer.value = customers[0]
         customerOptions.value = customers
     })
