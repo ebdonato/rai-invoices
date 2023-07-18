@@ -134,6 +134,11 @@ const props = defineProps({
         required: false,
         default: null,
     },
+    copyFromId: {
+        type: String,
+        required: false,
+        default: null,
+    },
 })
 
 const receiptsPath = `users/${user.uid}/receipts`
@@ -259,6 +264,8 @@ const onCancelClick = () => {
 
 onMounted(() => {
     props.id && getReceipt(props.id)
+    !props.id && props.copyFromId && getReceipt(props.copyFromId)
+
     getCities(receipt.state)
         .then((response) => {
             cities.value = [...response]

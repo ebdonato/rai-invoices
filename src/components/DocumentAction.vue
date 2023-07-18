@@ -1,25 +1,29 @@
 <template>
-    <div class="q-gutter-sm">
-        <q-btn flat dense round color="primary" icon="edit" aria-label="Editar" @click="$emit('edit')">
-            <q-tooltip :delay="1000"> Editar </q-tooltip>
-        </q-btn>
+    <q-btn v-if="props.docType == 'receipt'" flat dense round color="primary" icon="control_point_duplicate" aria-label="Duplicar" @click="$emit('duplicate')">
+        <q-tooltip :delay="1000"> Duplicar </q-tooltip>
+    </q-btn>
 
-        <q-btn flat dense round color="primary" icon="fa-solid fa-arrow-up-right-from-square" aria-label="Abrir" @click="openLink">
-            <q-tooltip :delay="1000"> Abrir </q-tooltip>
-        </q-btn>
+    <q-space />
 
-        <q-btn flat dense round color="primary" icon="fa-solid fa-copy" aria-label="Copiar link" @click="copyLink">
-            <q-tooltip :delay="1000"> Copiar link </q-tooltip>
-        </q-btn>
+    <q-btn flat dense round color="primary" icon="edit" aria-label="Editar" @click="$emit('edit')">
+        <q-tooltip :delay="1000"> Editar </q-tooltip>
+    </q-btn>
 
-        <q-btn v-if="props.docType == 'invoice'" flat dense round color="primary" icon="fa-solid fa-file-word" aria-label="Download" type="a" :href="downloadUrl" target="_blank">
-            <q-tooltip :delay="1000"> Download (docx) </q-tooltip>
-        </q-btn>
+    <q-btn flat dense round color="primary" icon="fa-solid fa-arrow-up-right-from-square" aria-label="Abrir" @click="openLink">
+        <q-tooltip :delay="1000"> Abrir </q-tooltip>
+    </q-btn>
 
-        <q-btn v-if="isSupported" flat dense round color="primary" icon="fa-solid fa-share-nodes" aria-label="Compartilhar" @click="startShare">
-            <q-tooltip :delay="1000"> Compartilhar </q-tooltip>
-        </q-btn>
-    </div>
+    <q-btn flat dense round color="primary" icon="fa-solid fa-copy" aria-label="Copiar link" @click="copyLink">
+        <q-tooltip :delay="1000"> Copiar link </q-tooltip>
+    </q-btn>
+
+    <q-btn v-if="props.docType == 'invoice'" flat dense round color="primary" icon="fa-solid fa-file-word" aria-label="Download" type="a" :href="downloadUrl" target="_blank">
+        <q-tooltip :delay="1000"> Download (docx) </q-tooltip>
+    </q-btn>
+
+    <q-btn v-if="isSupported" flat dense round color="primary" icon="fa-solid fa-share-nodes" aria-label="Compartilhar" @click="startShare">
+        <q-tooltip :delay="1000"> Compartilhar </q-tooltip>
+    </q-btn>
 </template>
 
 <script setup>
@@ -31,7 +35,7 @@ const { share, isSupported } = useShare()
 
 const $q = useQuasar()
 
-defineEmits(["edit"])
+defineEmits(["edit", "duplicate"])
 
 function startShare() {
     const title = `${docName.value} ${props.userInfoName ? "de" : ""} ${props.userInfoName}`

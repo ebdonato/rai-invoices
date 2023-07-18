@@ -51,8 +51,15 @@
                                 </div>
                             </div>
                         </q-card-section>
-                        <q-card-actions align="right" class="q-pa-sm">
-                            <DocumentAction :doc-id="receipt.id" :user-id="user.uid" :userInfoName="userInfoName" doc-type="receipt" @edit="onEdit(receipt.id)" />
+                        <q-card-actions class="q-pa-sm q-gutter-sm">
+                            <DocumentAction
+                                :doc-id="receipt.id"
+                                :user-id="user.uid"
+                                :userInfoName="userInfoName"
+                                doc-type="receipt"
+                                @edit="onEdit(receipt.id)"
+                                @duplicate="onDuplicate(receipt.id)"
+                            />
                         </q-card-actions>
                     </q-card>
                     <q-banner v-if="receipts.length === 0" rounded inline-actions class="full-width">Nenhum item {{ filter ? "encontrado" : "cadastrado" }}</q-banner>
@@ -207,6 +214,17 @@ const onQueryData = () => {
 const onCancelFilter = () => {
     filter.value = ""
     onQueryData()
+}
+
+const onDuplicate = (copyFromId) => {
+    $q.dialog({
+        component: ReceiptDialog,
+        componentProps: {
+            copyFromId,
+        },
+    }).onOk(() => {
+        onQueryData()
+    })
 }
 
 const onEdit = (id) => {
