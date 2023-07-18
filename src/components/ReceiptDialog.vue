@@ -98,7 +98,7 @@
 </template>
 
 <script setup>
-import { useDialogPluginComponent, useQuasar, date } from "quasar"
+import { useDialogPluginComponent, useQuasar, date as dateHelper } from "quasar"
 import { getFirestore, doc, getDoc, setDoc, deleteDoc, updateDoc, serverTimestamp } from "firebase/firestore"
 import { getAuth } from "firebase/auth"
 import { ref, onMounted, reactive } from "vue"
@@ -115,7 +115,7 @@ const $q = useQuasar()
 const receipt = reactive({
     customerName: "",
     customer: null,
-    date: date.formatDate(Date.now(), "DD/MM/YYYY"),
+    date: dateHelper.formatDate(Date.now(), "DD/MM/YYYY"),
     value: 0,
     details: "",
     state: "ES",
@@ -143,7 +143,7 @@ const props = defineProps({
 
 const receiptsPath = `users/${user.uid}/receipts`
 
-const getReceipt = (id) => {
+const getReceipt = (id, useDefaultDate = false) => {
     const docRef = doc(db, receiptsPath, id)
 
     $q.loading.show()
@@ -153,6 +153,7 @@ const getReceipt = (id) => {
             if (docSnap.exists()) {
                 const { customerName = "", customer = null, date = "", value = 0, details = "", state, city } = docSnap.data()
                 Object.assign(receipt, { customerName, customer, date, value, details, state, city })
+                useDefaultDate && (receipt.date = dateHelper.formatDate(Date.now(), "DD/MM/YYYY"))
             } else {
                 // doc.data() will be undefined in this case
                 throw new Error("Documento não encontrado")
@@ -264,7 +265,9 @@ const onCancelClick = () => {
 
 onMounted(() => {
     props.id && getReceipt(props.id)
-    !props.id && props.copyFromId && getReceipt(props.copyFromId)
+
+    const USE_DEFAULT_DATE = true
+    !props.id && props.copyFromId && getReceipt(props.copyFromId, USE_DEFAULT_DATE)
 
     getCities(receipt.state)
         .then((response) => {
